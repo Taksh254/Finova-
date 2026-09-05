@@ -1,0 +1,340 @@
+.container {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.orchestratorTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: rgba(29, 59, 143, 0.08);
+  border: 1px solid rgba(29, 59, 143, 0.2);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.systemStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-positive);
+  background-color: rgba(21, 128, 61, 0.08);
+  border: 1px solid rgba(21, 128, 61, 0.18);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.pulsingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-positive);
+  box-shadow: 0 0 6px var(--color-positive);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.2);
+  }
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-heading);
+  letter-spacing: -0.2px;
+}
+
+.subtitle {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  max-width: 800px;
+}
+
+.actionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.syncBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  padding: 7px 14px;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-heading);
+  transition: all 0.18s ease;
+}
+
+.syncBtn:hover {
+  background-color: #EEE8DB;
+  border-color: #C8C0AF;
+}
+
+.syncing {
+  opacity: 0.8;
+}
+
+.spinIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.approveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  padding: 7px 14px;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(29, 59, 143, 0.25);
+  transition: all 0.18s ease;
+}
+
+.approveBtn:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+/* Connected Workflow Pipeline */
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 8px 2px;
+}
+
+.agentCard {
+  background-color: var(--bg-card-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 14px;
+  flex: 1 1 0;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: all 0.18s ease;
+}
+
+.agentCard:hover {
+  background-color: #FAF6ED;
+  border-color: #DDD5C2;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.agentIdentity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.botIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agentName {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-heading);
+  line-height: 1.2;
+}
+
+.agentRole {
+  font-size: 10.5px;
+  color: #7B8A9E;
+  display: block;
+}
+
+/* Status Badges */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.statusRunning {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563EB;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.runDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #2563EB;
+  animation: pulse 1.5s infinite;
+}
+
+.statusCompleted {
+  background-color: rgba(21, 128, 61, 0.08);
+  color: var(--color-positive);
+  border: 1px solid rgba(21, 128, 61, 0.2);
+}
+
+.statusWaiting {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.statusAttention {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+.activityDesc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  min-height: 32px;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #ECE5D6;
+  padding-top: 8px;
+}
+
+.metricTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #5A6A85;
+}
+
+/* Pipeline Connector Arrow */
+.pipelineConnector {
+  display: flex;
+  align-items: center;
+  color: #8E877A;
+  flex-shrink: 0;
+  padding: 0 2px;
+}
+
+.connectorLine {
+  width: 14px;
+  height: 2px;
+  background-color: #DDD6C5;
+  position: relative;
+  overflow: hidden;
+}
+
+.dataPulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 6px;
+  background-color: var(--color-primary);
+  animation: pulseFlow 2s linear infinite;
+}
+
+@keyframes pulseFlow {
+  0% { transform: translateX(-10px); }
+  100% { transform: translateX(20px); }
+}
+
+.connectorArrow {
+  color: #8E877A;
+  margin-left: -2px;
+}
+
+@media (max-width: 1200px) {
+  .pipeline {
+    flex-wrap: wrap;
+  }
+  .pipelineConnector {
+    display: none;
+  }
+  .agentCard {
+    flex: 1 1 calc(50% - 10px);
+  }
+}
+
+@media (max-width: 640px) {
+  .agentCard {
+    flex: 1 1 100%;
+  }
+}

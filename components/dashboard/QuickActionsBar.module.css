@@ -1,0 +1,70 @@
+.actionBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+/* Primary Filled Royal Blue */
+.btnPrimary {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(29, 59, 143, 0.25);
+}
+
+.btnPrimary:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: 0 4px 10px rgba(29, 59, 143, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Secondary White/Cream Pill */
+.btnSecondary {
+  background-color: var(--bg-surface);
+  color: var(--text-heading);
+  border: 1px solid var(--border-medium);
+  box-shadow: 0 1px 2px rgba(15, 26, 62, 0.03);
+}
+
+.btnSecondary:hover {
+  background-color: #EEE8DA;
+  border-color: #C8C0AF;
+  transform: translateY(-1px);
+}
+
+/* Ask AI CFO Special Pill */
+.btnAICFO {
+  background: linear-gradient(135deg, #142A68 0%, #1D3B8F 100%);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(29, 59, 143, 0.3);
+  margin-left: auto;
+}
+
+.btnAICFO:hover {
+  background: linear-gradient(135deg, #102255 0%, #162E73 100%);
+  box-shadow: 0 4px 12px rgba(29, 59, 143, 0.4);
+  transform: translateY(-1px);
+}
+
+.sparkleIcon {
+  color: #93C5FD;
+}
+
+@media (max-width: 900px) {
+  .btnAICFO {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,82 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+/* Row 1: 4 Metric Cards */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* Row 2: Cash Flow (68%) & AI CFO (32%) */
+.middleRow {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.cashFlowCol {
+  flex: 1 1 68%;
+  min-width: 0;
+}
+
+.aiCfoCol {
+  flex: 0 0 32%;
+  min-width: 320px;
+}
+
+/* Row 4: 3-Column Section */
+.threeColRow {
+  display: grid;
+  grid-template-columns: 48% 26% 26%;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.recentTxCol {
+  min-width: 0;
+}
+
+.invoicesCol {
+  min-width: 0;
+  display: flex;
+}
+
+.invoicesCol > div {
+  width: 100%;
+}
+
+.healthCol {
+  min-width: 0;
+  display: flex;
+}
+
+.healthCol > div {
+  width: 100%;
+}
+
+@media (max-width: 1280px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .middleRow {
+    flex-direction: column;
+  }
+  .aiCfoCol {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .threeColRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}

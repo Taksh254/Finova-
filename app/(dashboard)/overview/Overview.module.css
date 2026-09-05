@@ -1,0 +1,80 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1400px) {
+  .metricsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.middleSection {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1000px) {
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.companyMetaBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.metaGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metaLabel {
+  color: var(--text-muted);
+}
+
+.metaValue {
+  color: var(--text-primary);
+  font-weight: 500;
+}

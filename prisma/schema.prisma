@@ -1,0 +1,149 @@
+// Finova - Finance Operations Platform
+// Prisma Schema - SQLite for hackathon MVP
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id              String   @id @default(cuid())
+  name            String
+  displayName     String
+  currency        String   @default("INR")
+  fiscalYearStart Int      @default(4) // April (Indian FY)
+  industry        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  users           User[]
+  transactions    Transaction[]
+  invoices        Invoice[]
+  payrollRecords  PayrollRecord[]
+  cashFlowEntries CashFlowEntry[]
+  exceptions      Exception[]
+  documents       Document[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String   @default("ANALYST") // CFO, CONTROLLER, ANALYST, ADMIN
+  avatarUrl String?
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  date        DateTime
+  type        String   // REVENUE, EXPENSE, TRANSFER
+  category    String   // e.g., "Software", "Payroll", "Sales", "Marketing"
+  subCategory String?
+  amount      Float
+  currency    String   @default("INR")
+  description String
+  reference   String?  // Bank reference / transaction ID
+  status      String   @default("CLEARED") // CLEARED, PENDING, FLAGGED
+  companyId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
+  exceptionId String?
+}
+
+model Invoice {
+  id            String    @id @default(cuid())
+  invoiceNumber String
+  type          String    // RECEIVABLE (client owes us), PAYABLE (we owe vendor)
+  vendorClient  String    // Name of vendor or client
+  amount        Float
+  currency      String    @default("INR")
+  issueDate     DateTime
+  dueDate       DateTime
+  paidDate      DateTime?
+  status        String    @default("PENDING") // PENDING, PAID, OVERDUE, EXCEPTION
+  description   String?
+  companyId     String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
+  exceptionId String?
+}
+
+model PayrollRecord {
+  id          String   @id @default(cuid())
+  period      String   // e.g., "2025-08"
+  periodStart DateTime
+  periodEnd   DateTime
+  totalAmount Float
+  headcount   Int
+  status      String   @default("PENDING") // PENDING, PROCESSING, PAID, EXCEPTION
+  exceptions  Int      @default(0) // count of anomalies
+  companyId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
+  exceptionId String?
+}
+
+model CashFlowEntry {
+  id         String   @id @default(cuid())
+  date       DateTime
+  period     String   // "2025-08" for grouping
+  inflow     Float    @default(0)
+  outflow    Float    @default(0)
+  netFlow    Float    @default(0)
+  balance    Float    @default(0) // running balance
+  companyId  String
+  createdAt  DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Exception {
+  id          String    @id @default(cuid())
+  type        String    // RECONCILIATION, INVOICE, PAYROLL, FRAUD_ALERT, POLICY_BREACH
+  severity    String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  title       String
+  description String
+  status      String    @default("OPEN") // OPEN, IN_REVIEW, RESOLVED, DISMISSED
+  resolvedAt  DateTime?
+  companyId   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+  invoices        Invoice[]
+  payrollRecords  PayrollRecord[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // POLICY, CONTRACT, REPORT, RECEIPT, OTHER
+  url         String?
+  content     String?  // raw text for RAG ingestion
+  metadata    String?  // JSON string for flexible metadata (tags, author, etc.)
+  companyId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}

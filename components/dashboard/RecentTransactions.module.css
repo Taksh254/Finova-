@@ -1,0 +1,168 @@
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-heading);
+  letter-spacing: -0.2px;
+}
+
+.viewAllLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  transition: all 0.15s ease;
+}
+
+.viewAllLink:hover {
+  color: var(--color-primary-hover);
+  transform: translateX(2px);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8E877A;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 8px 10px 10px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.thAmount {
+  text-align: right;
+}
+
+.tr {
+  border-bottom: 1px solid #F1ECE0;
+  transition: background-color 0.15s ease;
+}
+
+.tr:hover {
+  background-color: #FAF7F0;
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.tdDate {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 11px 10px;
+  white-space: nowrap;
+}
+
+.tdDesc {
+  padding: 11px 10px;
+}
+
+.descCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vendorIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.descText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-heading);
+  white-space: nowrap;
+}
+
+.tdCategory {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 11px 10px;
+  white-space: nowrap;
+}
+
+.tdAccount {
+  font-size: 12px;
+  color: #64748B;
+  padding: 11px 10px;
+  white-space: nowrap;
+}
+
+.tdStatus {
+  padding: 11px 10px;
+  white-space: nowrap;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.statusCompleted {
+  background-color: rgba(21, 128, 61, 0.08);
+  color: var(--color-positive);
+  border: 1px solid rgba(21, 128, 61, 0.2);
+}
+
+.statusReceived {
+  background-color: rgba(29, 59, 143, 0.08);
+  color: var(--color-primary);
+  border: 1px solid rgba(29, 59, 143, 0.2);
+}
+
+.tdAmount {
+  padding: 11px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.amountCredit {
+  color: var(--color-positive);
+}
+
+.amountDebit {
+  color: var(--text-heading);
+}

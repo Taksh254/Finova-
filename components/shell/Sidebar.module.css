@@ -1,0 +1,267 @@
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  user-select: none;
+}
+
+/* Brand Header */
+.brandArea {
+  padding: 22px 22px 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoMark {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(145deg, #1D3B8F, #142A68);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(29, 59, 143, 0.25);
+  flex-shrink: 0;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandName {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: var(--text-heading);
+  line-height: 1.1;
+}
+
+.brandTagline {
+  font-size: 11px;
+  color: #7B8A9E;
+  font-style: italic;
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+
+/* Navigation Container */
+.navContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.navSection {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sectionTitle {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #9C9588;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  padding: 8px 12px 4px 12px;
+}
+
+.navItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #4A5568;
+  transition: all 0.18s ease;
+  position: relative;
+}
+
+.navItem:hover {
+  color: var(--text-heading);
+  background-color: #F1ECE0;
+}
+
+/* Active State: Royal Blue Pill */
+.navItemActive {
+  background-color: var(--color-primary) !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(29, 59, 143, 0.22);
+}
+
+.navItemActive .navIcon {
+  color: #FFFFFF !important;
+}
+
+.navItemActive .navLabel {
+  color: #FFFFFF !important;
+}
+
+.navItemContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navIcon {
+  color: #64748B;
+  transition: color 0.18s ease;
+  flex-shrink: 0;
+}
+
+.navItem:hover .navIcon {
+  color: var(--color-primary);
+}
+
+.navLabel {
+  letter-spacing: -0.1px;
+}
+
+/* Badges */
+.navBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 12px;
+  line-height: 1.4;
+}
+
+.navBadgeNormal {
+  background-color: #EEE7DA;
+  color: #5A6A85;
+}
+
+.navBadgeAlert {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+}
+
+.navBadgeAi {
+  background-color: rgba(29, 59, 143, 0.1);
+  color: var(--color-primary);
+  font-size: 10px;
+  letter-spacing: 0.3px;
+}
+
+.navItemActive .navBadgeNormal {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+/* Bottom Profile Section */
+.bottomSection {
+  padding: 16px 14px;
+  border-top: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  background-color: var(--color-primary-deep);
+  color: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(20, 42, 104, 0.2);
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.companyName {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userName {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aiStatusPill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background-color: rgba(21, 128, 61, 0.08);
+  border: 1px solid rgba(21, 128, 61, 0.16);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--color-positive);
+  font-weight: 600;
+}
+
+.statusPulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-positive);
+  box-shadow: 0 0 6px var(--color-positive);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+.statusText {
+  flex: 1;
+}
+
+.statusSparkle {
+  color: var(--color-positive);
+}

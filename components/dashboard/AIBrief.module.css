@@ -1,0 +1,203 @@
+.container {
+  background: linear-gradient(180deg, rgba(16, 22, 35, 0.95), rgba(11, 15, 25, 0.95));
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.brandPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aiIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #c4b5fd;
+  text-transform: uppercase;
+}
+
+.healthBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.healthStable {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.healthWatchlist {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.healthPulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.observationsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.obsCard {
+  background-color: rgba(23, 31, 50, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.obsCard:hover {
+  border-color: var(--border-medium);
+  background-color: rgba(23, 31, 50, 0.9);
+}
+
+.obsTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.obsDetail {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.recommendedSection {
+  background-color: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #c4b5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.actionItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.actionText {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #a78bfa;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.actionLink {
+  font-size: 11px;
+  font-weight: 600;
+  color: #60a5fa;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: color 0.15s ease;
+}
+
+.actionLink:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.modelTag {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
