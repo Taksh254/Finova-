@@ -6,18 +6,6 @@ FINOVA is a finance-operations platform built around one flagship capability: **
 
 ---
 
-## Screenshots
-
-**Frontend** — Payout Truth (`/payout-truth`): live reconciliation summary and per-payout breakdown, rendered from real Postgres data.
-
-![Payout Truth frontend](docs/screenshots/frontend-payout-truth.png)
-
-**Backend** — raw JSON from `GET /api/payouts`, the API route backing the page above:
-
-![Backend API response](docs/screenshots/backend-api-response.png)
-
----
-
 ## What's actually implemented
 
 To keep this README honest as the product evolves, here's what's real vs. presentational today:
