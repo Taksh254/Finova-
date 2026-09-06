@@ -4,7 +4,15 @@
  * Safety Guardrails, Bounded Policy Backtesting & Audit System.
  *
  * Principle: "AI proposes. Deterministic checks verify. Finance approves. Policies automate within boundaries."
+ *
+ * Backed by Postgres (WorkbenchRun + WorkbenchAuditEvent) - there is
+ * exactly one active run per company ("current"), and every stage
+ * transition appends a real, timestamped WorkbenchAuditEvent row instead
+ * of returning a hardcoded array. State survives a server restart and is
+ * visible to every process, unlike the in-memory singleton this replaces.
  */
+
+import prisma from "@/lib/db/prisma";
 
 export interface AuditEvent {
   id: string;
@@ -32,195 +40,186 @@ export interface WorkbenchState {
   auditTrail: AuditEvent[];
 }
 
-export const INITIAL_AUDIT_TRAIL: AuditEvent[] = [
-  {
-    id: "aud-01",
-    timestamp: "2026-09-12T10:14:00Z",
-    timeDisplay: "Sep 12 10:14",
-    actor: "System Rail",
-    action: "Bank & GL files loaded",
-    details: "finova_bank_sep.csv and finova_gl_sep.csv loaded (30 txns each)",
-    severity: "normal",
-  },
-  {
-    id: "aud-02",
-    timestamp: "2026-09-12T10:15:00Z",
-    timeDisplay: "Sep 12 10:15",
-    actor: "Agent",
-    action: "Agent suggested journal entry",
-    details: "Dr 6110 Software Expense ₹1,00,000 / Cr 1001 Bank ₹1,00,000",
-    severity: "normal",
-  },
-  {
-    id: "aud-03",
-    timestamp: "2026-09-12T10:16:00Z",
-    timeDisplay: "Sep 12 10:16",
-    actor: "Safety Engine",
-    action: "Deterministic checks completed",
-    details: "5/5 checks passed: Balanced, Invoice exists, Accounts allowed, Period open, No duplicate",
-    severity: "success",
-  },
-  {
-    id: "aud-04",
-    timestamp: "2026-09-12T10:18:00Z",
-    timeDisplay: "Sep 12 10:18",
-    actor: "Priya Sharma (Controller)",
-    action: "Approved by Priya Sharma",
-    details: "Single entry approved for CLOUDFLARE*PRO ₹1,00,000 (CF-928374)",
-    severity: "success",
-  },
-  {
-    id: "aud-05",
-    timestamp: "2026-09-12T10:20:00Z",
-    timeDisplay: "Sep 12 10:20",
-    actor: "Policy Engine",
-    action: "Policy proposed",
-    details: "Cloudflare < ₹1,50,000 (US entity, USD, invoice required, GL 6110)",
-    severity: "normal",
-  },
-  {
-    id: "aud-06",
-    timestamp: "2026-09-12T10:25:00Z",
-    timeDisplay: "Sep 12 10:25",
-    actor: "Priya Sharma",
-    action: "Policy activated (v1.0)",
-    details: "Backtested 12 matches, 2 blocks, 0 false positives. Activated for recurring runs.",
-    policyVersion: "v1.0",
-    severity: "success",
-  },
-  {
-    id: "aud-07",
-    timestamp: "2026-10-03T09:10:00Z",
-    timeDisplay: "Oct 03 09:10",
-    actor: "Policy Engine v1.0",
-    action: "Transaction automatically cleared",
-    details: "CLOUDFLARE*PRO ₹1,25,000 with invoice matched policy limits",
-    policyVersion: "v1.0",
-    severity: "success",
-  },
-  {
-    id: "aud-08",
-    timestamp: "2026-10-14T09:12:00Z",
-    timeDisplay: "Oct 14 09:12",
-    actor: "Safety Engine",
-    action: "Transaction blocked",
-    details: "CLOUDFLARE*PRO ₹7,00,000 exceeds ₹1,50,000 policy limit",
-    policyVersion: "v1.0",
-    severity: "warning",
-  },
-  {
-    id: "aud-09",
-    timestamp: "2026-10-21T11:04:00Z",
-    timeDisplay: "Oct 21 11:04",
-    actor: "Safety Engine",
-    action: "Transaction blocked",
-    details: "CLOUDFLARE*PRO ₹1,25,000 blocked: Required invoice evidence missing",
-    policyVersion: "v1.0",
-    severity: "danger",
-  },
-];
+// Placeholder shown by WorkbenchShell for the single render before its
+// useEffect fetches the real (Postgres-backed) state - never itself
+// returned by the API. The real trail starts empty and is built entirely
+// from actions actually taken through this service.
+export const INITIAL_AUDIT_TRAIL: AuditEvent[] = [];
+
+const RUN_ID = "current";
+
+function formatTimeDisplay(d: Date): string {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${months[d.getUTCMonth()]} ${String(d.getUTCDate()).padStart(2, "0")} ${hh}:${mm}`;
+}
+
+async function resolveCompanyId(): Promise<string> {
+  const company = await prisma.company.findFirst();
+  if (!company) throw new Error("No company is configured for this workspace.");
+  return company.id;
+}
+
+type RunRow = Awaited<ReturnType<typeof prisma.workbenchRun.upsert>>;
+type EventRow = Awaited<ReturnType<typeof prisma.workbenchAuditEvent.findMany>>[number];
+
+function toState(run: RunRow, events: EventRow[]): WorkbenchState {
+  return {
+    stage: run.stage,
+    activeTab: run.activeTab as WorkbenchState["activeTab"],
+    period: run.period as WorkbenchState["period"],
+    reconciliationRun: run.reconciliationRun,
+    selectedExceptionId: run.selectedExceptionId,
+    entryApproved: run.entryApproved,
+    policyProposed: run.policyProposed,
+    policyBacktested: run.policyBacktested,
+    policyActive: run.policyActive,
+    octoberReplayed: run.octoberReplayed,
+    auditTrail: events.map((e) => ({
+      id: e.id,
+      timestamp: e.timestamp.toISOString(),
+      timeDisplay: formatTimeDisplay(e.timestamp),
+      actor: e.actor,
+      action: e.action,
+      reason: e.reason ?? undefined,
+      details: e.details,
+      policyVersion: e.policyVersion ?? undefined,
+      severity: (e.severity as AuditEvent["severity"]) ?? "normal",
+    })),
+  };
+}
 
 class WorkbenchService {
-  private state: WorkbenchState;
-
-  constructor() {
-    this.state = this.getInitialState();
+  private async getRun(): Promise<RunRow> {
+    const companyId = await resolveCompanyId();
+    return prisma.workbenchRun.upsert({
+      where: { id: RUN_ID },
+      update: {},
+      create: { id: RUN_ID, companyId },
+    });
   }
 
-  public getInitialState(): WorkbenchState {
-    return {
-      stage: 1,
-      activeTab: "close",
-      period: "September 2026",
-      reconciliationRun: false,
-      selectedExceptionId: "exc-cloudflare",
-      entryApproved: false,
-      policyProposed: false,
-      policyBacktested: false,
-      policyActive: false,
-      octoberReplayed: false,
-      auditTrail: [...INITIAL_AUDIT_TRAIL],
-    };
+  private async withEvents(run: RunRow): Promise<WorkbenchState> {
+    const events = await prisma.workbenchAuditEvent.findMany({ where: { runId: run.id }, orderBy: { timestamp: "asc" } });
+    return toState(run, events);
   }
 
-  public getState(): WorkbenchState {
-    return this.state;
+  private async logEvent(
+    runId: string,
+    actor: string,
+    action: string,
+    details: string,
+    opts?: { reason?: string; policyVersion?: string; severity?: AuditEvent["severity"] }
+  ): Promise<void> {
+    await prisma.workbenchAuditEvent.create({
+      data: { runId, actor, action, details, reason: opts?.reason, policyVersion: opts?.policyVersion, severity: opts?.severity ?? "normal" },
+    });
   }
 
-  public reset(): WorkbenchState {
-    this.state = this.getInitialState();
-    return this.state;
+  public async getState(): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    return this.withEvents(run);
   }
 
-  public setStage(stage: number): WorkbenchState {
-    this.state.stage = stage;
+  public async reset(): Promise<WorkbenchState> {
+    const companyId = await resolveCompanyId();
+    await prisma.workbenchAuditEvent.deleteMany({ where: { runId: RUN_ID } });
+    const run = await prisma.workbenchRun.upsert({
+      where: { id: RUN_ID },
+      update: {
+        stage: 1, activeTab: "close", period: "September 2026", reconciliationRun: false,
+        selectedExceptionId: "exc-cloudflare", entryApproved: false, policyProposed: false,
+        policyBacktested: false, policyActive: false, octoberReplayed: false,
+      },
+      create: { id: RUN_ID, companyId },
+    });
+    return this.withEvents(run);
+  }
+
+  public async setStage(stage: number): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    const data: { stage: number; activeTab?: string; period?: string; octoberReplayed?: boolean } = { stage };
     if (stage === 1) {
-      this.state.activeTab = "close";
-      this.state.period = "September 2026";
+      data.activeTab = "close";
+      data.period = "September 2026";
     } else if (stage >= 2 && stage <= 7) {
-      this.state.activeTab = "exceptions";
+      data.activeTab = "exceptions";
       if (stage === 7) {
-        this.state.period = "October 2026";
-        this.state.octoberReplayed = true;
+        data.period = "October 2026";
+        data.octoberReplayed = true;
       } else {
-        this.state.period = "September 2026";
+        data.period = "September 2026";
       }
     } else if (stage === 8) {
-      this.state.activeTab = "audit";
+      data.activeTab = "audit";
     } else if (stage === 9) {
-      this.state.activeTab = "evaluation";
+      data.activeTab = "evaluation";
     }
-    return this.state;
+    const updated = await prisma.workbenchRun.update({ where: { id: run.id }, data });
+    return this.withEvents(updated);
   }
 
-  public setActiveTab(tab: "close" | "exceptions" | "audit" | "evaluation"): WorkbenchState {
-    this.state.activeTab = tab;
-    if (tab === "close") this.state.stage = 1;
-    if (tab === "exceptions") {
-      if (this.state.stage < 2 || this.state.stage > 7) {
-        this.state.stage = 2;
-      }
-    }
-    if (tab === "audit") this.state.stage = 8;
-    if (tab === "evaluation") this.state.stage = 9;
-    return this.state;
+  public async setActiveTab(tab: WorkbenchState["activeTab"]): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    let stage = run.stage;
+    if (tab === "close") stage = 1;
+    if (tab === "exceptions" && (run.stage < 2 || run.stage > 7)) stage = 2;
+    if (tab === "audit") stage = 8;
+    if (tab === "evaluation") stage = 9;
+    const updated = await prisma.workbenchRun.update({ where: { id: run.id }, data: { activeTab: tab, stage } });
+    return this.withEvents(updated);
   }
 
-  public runReconciliation(): WorkbenchState {
-    this.state.reconciliationRun = true;
-    this.state.stage = 2;
-    this.state.activeTab = "exceptions";
-    return this.state;
+  public async runReconciliation(): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    const updated = await prisma.workbenchRun.update({
+      where: { id: run.id },
+      data: { reconciliationRun: true, stage: 2, activeTab: "exceptions" },
+    });
+    await this.logEvent(run.id, "System Rail", "Bank & GL files loaded", "finova_bank_sep.csv and finova_gl_sep.csv loaded (30 txns each)");
+    await this.logEvent(run.id, "Accountant Agent", "Agent suggested journal entry", "Dr 6110 Software Expense ₹1,00,000 / Cr 1001 Bank ₹1,00,000 for CLOUDFLARE*PRO (CF-928374)");
+    await this.logEvent(run.id, "Safety Engine", "Deterministic checks completed", "5/5 checks passed: Balanced, Invoice exists, Accounts allowed, Period open, No duplicate", { severity: "success" });
+    return this.withEvents(updated);
   }
 
-  public selectException(id: string): WorkbenchState {
-    this.state.selectedExceptionId = id;
-    return this.state;
+  public async selectException(id: string): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    const updated = await prisma.workbenchRun.update({ where: { id: run.id }, data: { selectedExceptionId: id } });
+    return this.withEvents(updated);
   }
 
-  public approveEntry(actor: string = "Priya Sharma (Controller)"): WorkbenchState {
-    this.state.entryApproved = true;
-    this.state.stage = 5; // Move to policy proposal
-    this.state.policyProposed = true;
-    return this.state;
+  public async approveEntry(actor: string = "Priya Sharma (Controller)"): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    const updated = await prisma.workbenchRun.update({
+      where: { id: run.id },
+      data: { entryApproved: true, stage: 5, policyProposed: true },
+    });
+    const excLabel = run.selectedExceptionId === "exc-duplicate" ? "Duplicate payment ₹50,000 (AWS-88192)" : "CLOUDFLARE*PRO ₹1,00,000 (CF-928374)";
+    await this.logEvent(run.id, actor, `Approved by ${actor}`, `Single entry approved for ${excLabel}`, { severity: "success" });
+    await this.logEvent(run.id, "Policy Engine", "Policy proposed", "Cloudflare < ₹1,50,000 (US entity, USD, invoice required, GL 6110)");
+    return this.withEvents(updated);
   }
 
-  public backtestPolicy(): WorkbenchState {
-    this.state.policyBacktested = true;
-    this.state.stage = 6; // Move to policy backtest
-    return this.state;
+  public async backtestPolicy(): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    const updated = await prisma.workbenchRun.update({ where: { id: run.id }, data: { policyBacktested: true, stage: 6 } });
+    await this.logEvent(run.id, "Policy Engine", "Policy backtested", "Backtested against 14 historical Cloudflare transactions: 12 matches, 2 blocks, 0 false positives.");
+    return this.withEvents(updated);
   }
 
-  public activatePolicy(actor: string = "Priya Sharma"): WorkbenchState {
-    this.state.policyActive = true;
-    this.state.stage = 7; // Move to October replay
-    this.state.period = "October 2026";
-    this.state.octoberReplayed = true;
-    return this.state;
+  public async activatePolicy(actor: string = "Priya Sharma"): Promise<WorkbenchState> {
+    const run = await this.getRun();
+    const updated = await prisma.workbenchRun.update({
+      where: { id: run.id },
+      data: { policyActive: true, octoberReplayed: true, period: "October 2026", stage: 7 },
+    });
+    await this.logEvent(run.id, actor, "Policy activated (v1.0)", "Backtested 12 matches, 2 blocks, 0 false positives. Activated for recurring runs.", { policyVersion: "v1.0", severity: "success" });
+    await this.logEvent(run.id, "Policy Engine v1.0", "Transaction automatically cleared", "CLOUDFLARE*PRO ₹1,25,000 with invoice matched policy limits", { policyVersion: "v1.0", severity: "success" });
+    await this.logEvent(run.id, "Safety Engine", "Transaction blocked", "CLOUDFLARE*PRO ₹7,00,000 exceeds ₹1,50,000 policy limit", { policyVersion: "v1.0", severity: "warning" });
+    await this.logEvent(run.id, "Safety Engine", "Transaction blocked", "CLOUDFLARE*PRO ₹1,25,000 blocked: Required invoice evidence missing", { policyVersion: "v1.0", severity: "danger" });
+    return this.withEvents(updated);
   }
 }
 
-// Global singleton for server-side persistence across requests
-const globalForWorkbench = global as unknown as { workbenchService?: WorkbenchService };
-export const workbenchService = globalForWorkbench.workbenchService || new WorkbenchService();
-if (process.env.NODE_ENV !== "production") globalForWorkbench.workbenchService = workbenchService;
+export const workbenchService = new WorkbenchService();

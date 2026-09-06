@@ -1,8 +1,12 @@
 /**
  * FINOVA Payout Truth Service
  * Authoritative financial calculation, reconciliation, and audit logging engine.
- * Powered by deterministic backend logic and Prisma SQLite database.
- * 
+ * Powered by deterministic backend logic and a real Postgres database - every
+ * investigation, accounting entry, human review decision, and audit event is
+ * a persisted row (PayoutInvestigation/PayoutEvidence, PayoutAccountingEntry
+ * +Lines, PayoutReview, PayoutAuditLog), not an in-memory session Map. State
+ * survives a restart and is visible to every server process.
+ *
  * Principle: "FINOVA refuses to book what it cannot explain."
  */
 
@@ -14,6 +18,7 @@ import {
   StructuredEvidenceItem,
 } from "./evidence/types";
 import { getEvidenceService } from "./evidence/evidenceService";
+import type { Prisma } from "@prisma/client";
 
 export type PayoutStatus = "RECONCILED" | "NEEDS_REVIEW" | "PROCESSING";
 
@@ -137,40 +142,56 @@ export interface ReviewSubmissionPayload {
   user?: string;
 }
 
-// In-memory runtime session tracking for accounting voucher creation & review workflow
-const sessionAuditStore = new Map<
-  string,
-  {
-    accountingEntry?: AccountingEntry;
-    humanReviewState?: {
-      resolutionStatus: "PENDING" | "APPROVED" | "REJECTED" | "EVIDENCE_REQUESTED" | "ESCALATED" | "EXPLAINED";
-      resolvedAt?: string;
-      reviewerNote?: string;
-      evidenceReference?: string;
-      requestedEvidence?: string;
-      escalationReason?: string;
-      reviewerName?: string;
-    };
-    reviewLogs?: AuditLogItem[];
-    lastInvestigation?: InvestigationResult;
-    verifiedAdjustment?: {
-      amount: number;
-      reference: string;
-      description: string;
-    };
-  }
->();
-
 function resolveCanonicalId(id: string): string {
   if (id === "PO-RZP-8492") return "PO-1024";
   if (id === "PO-STR-9140") return "PO-1025";
   return id;
 }
 
+const payoutWithRelations = {
+  transactions: true,
+  exceptions: true,
+  accountingEntry: { include: { lines: true } },
+  reviews: { orderBy: { createdAt: "desc" as const } },
+  auditLogs: { orderBy: { timestamp: "asc" as const } },
+  investigations: {
+    orderBy: { investigatedAt: "desc" as const },
+    take: 1,
+    include: { evidence: true },
+  },
+} satisfies Prisma.PayoutInclude;
+
+type PayoutWithRelations = Prisma.PayoutGetPayload<{ include: typeof payoutWithRelations }>;
+
+function toInvestigationResult(inv: PayoutWithRelations["investigations"][number]): InvestigationResult {
+  return {
+    payoutId: inv.payoutId,
+    originalExpected: inv.originalExpected,
+    actualReceived: inv.actualReceived,
+    originalVariance: inv.originalVariance,
+    evidence: inv.evidence.map((e) => ({
+      id: e.id,
+      category: e.category as StructuredEvidenceItem["category"],
+      label: e.label,
+      status: e.status as StructuredEvidenceItem["status"],
+      amount: e.amount ?? undefined,
+      source: e.source ?? "",
+      reference: e.reference ?? undefined,
+      detail: e.detail,
+      verifiedAt: e.verifiedAt?.toISOString(),
+      metadata: (e.metadata as Record<string, unknown>) ?? undefined,
+    })),
+    conclusion: inv.conclusion as InvestigationResult["conclusion"],
+    totalEvidenceDiscovered: inv.totalEvidenceDiscovered,
+    remainingVariance: inv.remainingVariance,
+    applicableAdjustment: inv.applicableAdjustment,
+    investigatedAt: inv.investigatedAt.toISOString(),
+    notes: inv.notes,
+  };
+}
+
 export class PayoutTruthService {
-  /**
-   * Get KPI summary cards from database
-   */
+  /** Get KPI summary cards from database */
   async getSummary(): Promise<PayoutSummary> {
     const payouts = await prisma.payout.findMany();
 
@@ -181,25 +202,17 @@ export class PayoutTruthService {
       .filter((p) => p.status === "RECONCILED")
       .reduce((sum, p) => sum + p.actualReceivedAmount, 0);
 
-    return {
-      payoutsToReconcile,
-      successfullyReconciled,
-      exceptionsCount,
-      totalValueReconciled,
-    };
+    return { payoutsToReconcile, successfullyReconciled, exceptionsCount, totalValueReconciled };
   }
 
-  /**
-   * Get list of all payouts for the table
-   */
+  /** Get list of all payouts for the table */
   async getPayoutsList(): Promise<PayoutListItem[]> {
     const payouts = await prisma.payout.findMany({
-      include: { transactions: true },
+      include: { transactions: true, accountingEntry: true },
       orderBy: { payoutDate: "desc" },
     });
 
     return payouts.map((p) => {
-      const session = sessionAuditStore.get(p.id);
       const isReconciled = p.status === "RECONCILED";
       const txCount = p.id === "PO-1024" ? 1240 : p.id === "PO-1025" ? 1180 : p.transactions.length;
 
@@ -214,29 +227,25 @@ export class PayoutTruthService {
         difference: p.difference,
         status: p.status as PayoutStatus,
         transactionsCount: txCount,
-        hasAccountingEntry: session?.accountingEntry?.created || isReconciled,
+        hasAccountingEntry: Boolean(p.accountingEntry) || isReconciled,
       };
     });
   }
 
-  /**
-   * Get deep investigation view data for a single payout
-   */
+  /** Get deep investigation view data for a single payout */
   async getPayoutDetail(id: string): Promise<PayoutDetail | null> {
     const canonicalId = resolveCanonicalId(id);
 
     const payout = await prisma.payout.findUnique({
       where: { id: canonicalId },
-      include: { transactions: true, exceptions: true },
+      include: payoutWithRelations,
     });
-
     if (!payout) return null;
 
-    const session = sessionAuditStore.get(canonicalId);
     const isReconciled = payout.status === "RECONCILED";
     const txCount = canonicalId === "PO-1024" ? 1240 : canonicalId === "PO-1025" ? 1180 : payout.transactions.length;
+    const latestInvestigation = payout.investigations[0];
 
-    // Structured breakdown
     const breakdown: PayoutBreakdown = {
       gross: payout.grossAmount,
       platformFees: payout.platformFees,
@@ -252,29 +261,28 @@ export class PayoutTruthService {
       unexplained: payout.difference,
     };
 
-    // Structured evidence based on deterministic verification or active investigation
     let evidence: EvidenceItem[];
-    if (session?.lastInvestigation) {
-      evidence = session.lastInvestigation.evidence.map((item) => ({
+    if (latestInvestigation) {
+      evidence = latestInvestigation.evidence.map((item) => ({
         id: item.id,
         label: item.label,
-        status: item.status as any,
+        status: item.status as EvidenceItem["status"],
         detail: item.detail,
-        category: item.category as any,
-        amount: item.amount,
-        source: item.source,
-        reference: item.reference,
-        verifiedAt: item.verifiedAt,
+        category: item.category as EvidenceItem["category"],
+        amount: item.amount ?? undefined,
+        source: item.source ?? undefined,
+        reference: item.reference ?? undefined,
+        verifiedAt: item.verifiedAt?.toISOString(),
       }));
     } else if (isReconciled) {
       evidence = [
         {
           id: "ev-1",
-          label: "1,240 transactions matched",
+          label: `${txCount.toLocaleString()} transactions matched`,
           status: "VERIFIED",
-          detail: "All 1,240 customer order UTRs matched 1:1 between internal sales records and the gateway settlement batch. Zero orphaned transactions.",
+          detail: `All ${txCount.toLocaleString()} customer order UTRs matched 1:1 between internal sales records and the gateway settlement batch. Zero orphaned transactions.`,
           category: "TRANSACTIONS",
-          amount: 1000000,
+          amount: payout.grossAmount,
           source: "Core Transaction Ledger",
           reference: `BATCH-${canonicalId}-2026`,
         },
@@ -282,27 +290,27 @@ export class PayoutTruthService {
           id: "ev-2",
           label: "Gross sales verified",
           status: "VERIFIED",
-          detail: "Sum of verified gross sales transactions equals ₹10,00,000. Batch totals match ledger credit records.",
+          detail: `Sum of verified gross sales transactions equals ₹${payout.grossAmount.toLocaleString("en-IN")}. Batch totals match ledger credit records.`,
           category: "TRANSACTIONS",
-          amount: 1000000,
+          amount: payout.grossAmount,
           source: "Transaction Ledger",
         },
         {
           id: "ev-3",
           label: "Platform fees verified",
           status: "VERIFIED",
-          detail: "₹20,000 charged at exactly 2.00% standard rate per the active Razorpay Enterprise Merchant Agreement. No surprise charges.",
+          detail: `₹${payout.platformFees.toLocaleString("en-IN")} charged at exactly 2.00% standard rate per the active Razorpay Enterprise Merchant Agreement. No surprise charges.`,
           category: "FEES",
-          amount: 20000,
+          amount: payout.platformFees,
           source: "Gateway Settlement File",
         },
         {
           id: "ev-4",
           label: "Refunds verified",
           status: "VERIFIED",
-          detail: "₹15,000 across 7 authorized customer return requests, each backed by an approved RMA slip and reversal reference.",
+          detail: `₹${payout.refunds.toLocaleString("en-IN")} across 7 authorized customer return requests, each backed by an approved RMA slip and reversal reference.`,
           category: "REFUNDS",
-          amount: 15000,
+          amount: payout.refunds,
           source: "Refund Ledger",
         },
         {
@@ -311,7 +319,7 @@ export class PayoutTruthService {
           status: "VERIFIED",
           detail: "Statutory tax withheld matches tax rules: ₹3,600 GST Input Credit + ₹1,400 Section 194H TDS Certificate generated.",
           category: "TAXES",
-          amount: 5000,
+          amount: payout.taxes,
           source: "Statutory Tax Ledger",
         },
         {
@@ -328,47 +336,47 @@ export class PayoutTruthService {
       evidence = [
         {
           id: "ev-b1",
-          label: "1,180 transactions matched",
+          label: `${txCount.toLocaleString()} transactions matched`,
           status: "VERIFIED",
           detail: "Underlying sales transactions verified against order fulfillment database (#ORD-8812 to #ORD-9992).",
           category: "TRANSACTIONS",
-          amount: 1000000,
+          amount: payout.grossAmount,
           source: "Transaction Ledger",
         },
         {
           id: "ev-b2",
           label: "Gross sales verified",
           status: "VERIFIED",
-          detail: "Sum of customer orders equals ₹10,00,000 Gross Sales. Internal revenue sub-ledger confirms all batch orders cleared.",
+          detail: `Sum of customer orders equals ₹${payout.grossAmount.toLocaleString("en-IN")} Gross Sales. Internal revenue sub-ledger confirms all batch orders cleared.`,
           category: "TRANSACTIONS",
-          amount: 1000000,
+          amount: payout.grossAmount,
           source: "Transaction Ledger",
         },
         {
           id: "ev-b3",
           label: "Platform fees verified",
           status: "VERIFIED",
-          detail: "Standard platform processing fee of ₹20,000 corresponds to 2.0% agreed merchant pricing tier.",
+          detail: `Standard platform processing fee of ₹${payout.platformFees.toLocaleString("en-IN")} corresponds to 2.0% agreed merchant pricing tier.`,
           category: "FEES",
-          amount: 20000,
+          amount: payout.platformFees,
           source: "Gateway Settlement File",
         },
         {
           id: "ev-b4",
           label: "Refunds verified",
           status: "VERIFIED",
-          detail: "Internal CRM and support logs authorize ₹15,000 in customer returns across 6 RMA tickets.",
+          detail: `Internal CRM and support logs authorize ₹${payout.refunds.toLocaleString("en-IN")} in customer returns across 6 RMA tickets.`,
           category: "REFUNDS",
-          amount: 15000,
+          amount: payout.refunds,
           source: "Refund Ledger",
         },
         {
           id: "ev-b5",
           label: "Taxes verified",
           status: "VERIFIED",
-          detail: "Tax deduction calculated on contracted fee matches statutory requirements (₹5,000).",
+          detail: `Tax deduction calculated on contracted fee matches statutory requirements (₹${payout.taxes.toLocaleString("en-IN")}).`,
           category: "TAXES",
-          amount: 5000,
+          amount: payout.taxes,
           source: "Statutory Tax Ledger",
         },
         {
@@ -399,7 +407,7 @@ export class PayoutTruthService {
       ];
     }
 
-    // Human review state
+    const latestReview = payout.reviews[0];
     const humanReview: HumanReviewData = isReconciled
       ? {
           required: false,
@@ -419,16 +427,17 @@ export class PayoutTruthService {
           differenceSummary: "₹18,000 cannot currently be explained",
           reasonNotConfident: "FINOVA refuses to book what it cannot explain. Booking this entry automatically would leave an untraceable ₹18,000 leakage in your merchant clearing ledger. A human controller must verify whether the gateway levied an unnotified international chargeback or disputed reversal.",
           suggestedResolution: "Contact Payment Gateway Support for the itemized Dispute Log, or approve a temporary hold to 'Disputed Gateway Receivables'.",
-          resolutionStatus: session?.humanReviewState?.resolutionStatus || "PENDING",
-          resolvedAt: session?.humanReviewState?.resolvedAt,
-          reviewerNote: session?.humanReviewState?.reviewerNote,
-          evidenceReference: session?.humanReviewState?.evidenceReference,
-          requestedEvidence: session?.humanReviewState?.requestedEvidence,
-          escalationReason: session?.humanReviewState?.escalationReason,
-          reviewerName: session?.humanReviewState?.reviewerName,
+          resolutionStatus: (latestReview?.resolutionStatus as HumanReviewData["resolutionStatus"]) || "PENDING",
+          resolvedAt: latestReview?.createdAt.toISOString(),
+          reviewerNote: latestReview?.reviewerNote ?? undefined,
+          evidenceReference: latestReview?.evidenceReference ?? undefined,
+          requestedEvidence: latestReview?.requestedEvidence ?? undefined,
+          escalationReason: latestReview?.escalationReason ?? undefined,
+          reviewerName: latestReview?.reviewerName,
         };
 
-    // Double entry accounting lines
+    const disputeRef = latestInvestigation?.evidence.find((e) => e.reference && (e.status === "VERIFIED" || e.status === "PARTIALLY_MATCHED"))?.reference || "GD-88421";
+
     const defaultLines: DoubleEntryLine[] = isReconciled
       ? (canonicalId === "PO-1024"
           ? [
@@ -443,7 +452,7 @@ export class PayoutTruthService {
               { type: "DEBIT", accountCode: "5040", accountName: "Payment Gateway Processing Fees", amount: payout.platformFees },
               { type: "DEBIT", accountCode: "4090", accountName: "Authorized Customer Refunds", amount: payout.refunds },
               { type: "DEBIT", accountCode: "1320", accountName: "GST & TDS Statutory Credit", amount: payout.taxes },
-              { type: "DEBIT", accountCode: "1490", accountName: `Disputed Gateway Receivables (${session?.verifiedAdjustment?.reference || "GD-88421"})`, amount: Math.abs(payout.adjustments || 18000) },
+              { type: "DEBIT", accountCode: "1490", accountName: `Disputed Gateway Receivables (${disputeRef})`, amount: Math.abs(payout.adjustments || 18000) },
               { type: "CREDIT", accountCode: "1210", accountName: "Merchant Settlement Clearing Account", amount: payout.grossAmount },
             ]
         )
@@ -471,24 +480,19 @@ export class PayoutTruthService {
           ? "Reconciled all deductions. Every rupee traced. Zero discrepancy."
           : "DISCREPANCY DETECTED: Bank received ₹9,42,000 vs expected ₹9,60,000. ₹18,000 remains unexplained. Autonomous booking blocked.",
       },
-      ...(session?.reviewLogs || []),
+      ...payout.auditLogs.map((l) => ({ timestamp: l.timestamp.toISOString(), action: l.action, actor: l.actor, details: l.details })),
     ];
 
-    const accountingEntry: AccountingEntry = session?.accountingEntry
+    const accountingEntry: AccountingEntry = payout.accountingEntry
       ? {
-          ...session.accountingEntry,
-          auditLog: [
-            ...session.accountingEntry.auditLog,
-            ...(session?.reviewLogs || []).filter(
-              (r) => !session.accountingEntry?.auditLog.some((a) => a.action === r.action && a.timestamp === r.timestamp)
-            ),
-          ],
-        }
-      : {
-          created: false,
-          lines: defaultLines,
+          created: true,
+          entryNumber: payout.accountingEntry.entryNumber,
+          createdAt: payout.accountingEntry.createdAt.toISOString(),
+          createdBy: payout.accountingEntry.createdBy,
+          lines: payout.accountingEntry.lines.map((l) => ({ type: l.type as "DEBIT" | "CREDIT", accountCode: l.accountCode, accountName: l.accountName, amount: l.amount })),
           auditLog: baseAuditLogs,
-        };
+        }
+      : { created: false, lines: defaultLines, auditLog: baseAuditLogs };
 
     return {
       id: payout.id,
@@ -504,12 +508,12 @@ export class PayoutTruthService {
       evidence,
       humanReview,
       accountingEntry,
-      investigation: session?.lastInvestigation,
+      investigation: latestInvestigation ? toInvestigationResult(latestInvestigation) : undefined,
     };
   }
 
   /**
-   * Deterministically re-evaluate reconciliation using underlying transactions
+   * Deterministically re-evaluate reconciliation using underlying transactions.
    * Principle: "FINOVA refuses to book what it cannot explain."
    */
   async reconcilePayoutWithEvidence(id: string): Promise<ReconcileResult | null> {
@@ -519,10 +523,8 @@ export class PayoutTruthService {
       where: { id: canonicalId },
       include: { transactions: true, exceptions: true },
     });
-
     if (!payout) return null;
 
-    // Transaction matching and aggregation
     const txList = payout.transactions;
     const txCount = canonicalId === "PO-1024" ? 1240 : canonicalId === "PO-1025" ? 1180 : txList.length;
 
@@ -536,7 +538,6 @@ export class PayoutTruthService {
     const refunds = refundsTx.length > 0 ? refundsTx.reduce((s, t) => s + Math.abs(t.amount), 0) : payout.refunds;
     const taxes = taxesTx.length > 0 ? taxesTx.reduce((s, t) => s + Math.abs(t.amount), 0) : payout.taxes;
 
-    // Run deterministic calculation engine
     const evidence = reconcileDeterministic({
       payoutId: canonicalId,
       gross,
@@ -548,7 +549,6 @@ export class PayoutTruthService {
       transactionsCount: txCount,
     });
 
-    // Update database record
     await prisma.payout.update({
       where: { id: canonicalId },
       data: {
@@ -559,11 +559,8 @@ export class PayoutTruthService {
       },
     });
 
-    // If difference !== 0, ensure an Exception exists in Prisma Exception model
     if (evidence.difference !== 0) {
-      const existingExc = await prisma.exception.findFirst({
-        where: { payoutId: canonicalId, status: "OPEN" },
-      });
+      const existingExc = await prisma.exception.findFirst({ where: { payoutId: canonicalId, status: "OPEN" } });
       if (!existingExc) {
         await prisma.exception.create({
           data: {
@@ -581,11 +578,7 @@ export class PayoutTruthService {
 
     const detail = await this.getPayoutDetail(canonicalId);
     if (!detail) return null;
-
-    return {
-      payout: detail,
-      evidence,
-    };
+    return { payout: detail, evidence };
   }
 
   async reconcilePayout(id: string): Promise<PayoutDetail | null> {
@@ -594,100 +587,120 @@ export class PayoutTruthService {
   }
 
   /**
-   * Run structured investigation tools across gateway disputes, reserve policies, and transactions
-   * Coordinates with EvidenceService and records audit events.
+   * Run structured investigation tools across gateway disputes, reserve policies,
+   * and transactions. Persists the investigation and its evidence as real rows.
    */
-  async investigatePayout(
-    id: string,
-    options?: InvestigationScenarioOptions
-  ): Promise<{ payout: PayoutDetail; investigation: InvestigationResult } | null> {
+  async investigatePayout(id: string, options?: InvestigationScenarioOptions): Promise<{ payout: PayoutDetail; investigation: InvestigationResult } | null> {
     const canonicalId = resolveCanonicalId(id);
-    const detail = await this.getPayoutDetail(canonicalId);
-    if (!detail) return null;
+    const existing = await prisma.payout.findUnique({ where: { id: canonicalId } });
+    if (!existing) return null;
 
     const evidenceService = getEvidenceService();
     const investigation = await evidenceService.investigatePayout(canonicalId, options);
+    const timestamp = new Date();
 
-    const timestamp = new Date().toISOString();
-    const existing = sessionAuditStore.get(canonicalId) || {};
-    const reviewLogs = existing.reviewLogs || [];
-
-    reviewLogs.push({
-      timestamp,
-      action: "INVESTIGATION_STARTED",
-      actor: "FINOVA Evidence Engine",
-      details: `Initiated automated multi-source evidence query across Gateway Dispute API and Reserve Policy Engine for ${canonicalId}.`,
+    await prisma.payoutInvestigation.create({
+      data: {
+        payoutId: canonicalId,
+        scenario: options?.scenario,
+        originalExpected: investigation.originalExpected,
+        actualReceived: investigation.actualReceived,
+        originalVariance: investigation.originalVariance,
+        conclusion: investigation.conclusion,
+        totalEvidenceDiscovered: investigation.totalEvidenceDiscovered,
+        remainingVariance: investigation.remainingVariance,
+        applicableAdjustment: investigation.applicableAdjustment,
+        notes: investigation.notes,
+        investigatedAt: timestamp,
+        evidence: {
+          create: investigation.evidence.map((e) => ({
+            payoutId: canonicalId,
+            category: e.category,
+            label: e.label,
+            status: e.status,
+            detail: e.detail,
+            amount: e.amount,
+            source: e.source,
+            reference: e.reference,
+            metadata: e.metadata as Prisma.InputJsonValue | undefined,
+            verifiedAt: e.verifiedAt ? new Date(e.verifiedAt) : undefined,
+          })),
+        },
+      },
     });
 
-    reviewLogs.push({
-      timestamp,
-      action: "EVIDENCE_CHECKED",
-      actor: "FINOVA Evidence Engine",
-      details: `Scanned 6 financial evidence domains. Query completed: ${investigation.evidence.length} evidence records evaluated.`,
-    });
+    const auditRows: Prisma.PayoutAuditLogCreateManyInput[] = [
+      {
+        payoutId: canonicalId,
+        timestamp,
+        action: "INVESTIGATION_STARTED",
+        actor: "FINOVA Evidence Engine",
+        details: `Initiated automated multi-source evidence query across Gateway Dispute API and Reserve Policy Engine for ${canonicalId}.`,
+      },
+      {
+        payoutId: canonicalId,
+        timestamp,
+        action: "EVIDENCE_CHECKED",
+        actor: "FINOVA Evidence Engine",
+        details: `Scanned 6 financial evidence domains. Query completed: ${investigation.evidence.length} evidence records evaluated.`,
+      },
+    ];
 
     if (investigation.conclusion === "EXPLAINED" || investigation.conclusion === "PARTIALLY_EXPLAINED") {
       const match = investigation.evidence.find((e) => e.status === "VERIFIED" || e.status === "PARTIALLY_MATCHED");
-      reviewLogs.push({
+      auditRows.push({
+        payoutId: canonicalId,
         timestamp,
         action: "EVIDENCE_FOUND",
         actor: "Razorpay Dispute Gateway Connector",
-        details: `Discovered verified adjustment of ₹${(investigation.totalEvidenceDiscovered).toLocaleString("en-IN")} (${match?.reference || "GD-88421"}): "${match?.label}".`,
+        details: `Discovered verified adjustment of ₹${investigation.totalEvidenceDiscovered.toLocaleString("en-IN")} (${match?.reference || "GD-88421"}): "${match?.label}".`,
       });
     } else {
-      reviewLogs.push({
+      auditRows.push({
+        payoutId: canonicalId,
         timestamp,
         action: "EVIDENCE_NOT_FOUND",
         actor: "FINOVA Evidence Engine",
         details: `Zero matching dispute withholdings or reserve deductions found. Discrepancy of ₹${investigation.originalVariance.toLocaleString("en-IN")} remains unexplained.`,
       });
     }
-
-    sessionAuditStore.set(canonicalId, {
-      ...existing,
-      lastInvestigation: investigation,
-      reviewLogs,
-    });
+    await prisma.payoutAuditLog.createMany({ data: auditRows });
 
     const updatedDetail = await this.getPayoutDetail(canonicalId);
     if (!updatedDetail) return null;
-
-    return {
-      payout: updatedDetail,
-      investigation,
-    };
+    return { payout: updatedDetail, investigation };
   }
 
   /**
-   * Re-run deterministic reconciliation engine using discovered evidence
-   * Feeds the verified adjustment into reconcileDeterministic()
-   * Principle: "FINOVA refuses to book what it cannot explain."
+   * Re-run deterministic reconciliation using the most recently persisted
+   * investigation's discovered evidence. Feeds the verified adjustment into
+   * reconcileDeterministic(). Principle: "FINOVA refuses to book what it
+   * cannot explain."
    */
-  async rerunReconciliationWithEvidence(
-    id: string,
-    options?: InvestigationScenarioOptions
-  ): Promise<{ payout: PayoutDetail; evidence: ReconciliationEvidence } | null> {
+  async rerunReconciliationWithEvidence(id: string, options?: InvestigationScenarioOptions): Promise<{ payout: PayoutDetail; evidence: ReconciliationEvidence } | null> {
     const canonicalId = resolveCanonicalId(id);
-    let session = sessionAuditStore.get(canonicalId);
 
-    // If investigation hasn't run yet, run it now
-    if (!session?.lastInvestigation) {
-      await this.investigatePayout(canonicalId, options);
-      session = sessionAuditStore.get(canonicalId);
-    }
-
-    const investigation = session?.lastInvestigation;
-    if (!investigation) return null;
-
-    const payout = await prisma.payout.findUnique({
-      where: { id: canonicalId },
-      include: { transactions: true },
+    let latest = await prisma.payoutInvestigation.findFirst({
+      where: { payoutId: canonicalId },
+      orderBy: { investigatedAt: "desc" },
+      include: { evidence: true },
     });
+
+    if (!latest) {
+      await this.investigatePayout(canonicalId, options);
+      latest = await prisma.payoutInvestigation.findFirst({
+        where: { payoutId: canonicalId },
+        orderBy: { investigatedAt: "desc" },
+        include: { evidence: true },
+      });
+    }
+    if (!latest) return null;
+
+    const payout = await prisma.payout.findUnique({ where: { id: canonicalId }, include: { transactions: true } });
     if (!payout) return null;
 
-    const adjustment = investigation.applicableAdjustment; // e.g. -18000
+    const adjustment = latest.applicableAdjustment;
 
-    // Deterministic re-calculation through existing engine
     const evidence = reconcileDeterministic({
       payoutId: canonicalId,
       gross: payout.grossAmount,
@@ -699,7 +712,6 @@ export class PayoutTruthService {
       transactionsCount: canonicalId === "PO-1024" ? 1240 : canonicalId === "PO-1025" ? 1180 : payout.transactions.length,
     });
 
-    // Persist adjustment and updated reconciliation status to Prisma database
     await prisma.payout.update({
       where: { id: canonicalId },
       data: {
@@ -711,9 +723,8 @@ export class PayoutTruthService {
       },
     });
 
-    // Update Exception in Prisma database if resolved
     if (evidence.difference === 0) {
-      const disputeRef = investigation.evidence.find((e) => e.reference && (e.status === "VERIFIED" || e.status === "PARTIALLY_MATCHED"))?.reference || "GD-88421";
+      const disputeRef = latest.evidence.find((e) => e.reference && (e.status === "VERIFIED" || e.status === "PARTIALLY_MATCHED"))?.reference || "GD-88421";
       await prisma.exception.updateMany({
         where: { payoutId: canonicalId },
         data: {
@@ -724,98 +735,75 @@ export class PayoutTruthService {
       });
     }
 
-    const timestamp = new Date().toISOString();
-    const reviewLogs = session?.reviewLogs || [];
-    reviewLogs.push({
-      timestamp,
-      action: "RECONCILIATION_RERUN",
-      actor: "FINOVA Deterministic Engine",
-      details: `Reconciliation engine re-executed with verified adjustment of ₹${Math.abs(adjustment).toLocaleString("en-IN")}. Expected: ₹${evidence.expectedPayout.toLocaleString("en-IN")}, Bank: ₹${evidence.actualReceived.toLocaleString("en-IN")}. Resulting Variance: ₹${evidence.difference.toLocaleString("en-IN")}. Status: ${evidence.status}.`,
-    });
-
+    const timestamp = new Date();
+    const rows: Prisma.PayoutAuditLogCreateManyInput[] = [
+      {
+        payoutId: canonicalId,
+        timestamp,
+        action: "RECONCILIATION_RERUN",
+        actor: "FINOVA Deterministic Engine",
+        details: `Reconciliation engine re-executed with verified adjustment of ₹${Math.abs(adjustment).toLocaleString("en-IN")}. Expected: ₹${evidence.expectedPayout.toLocaleString("en-IN")}, Bank: ₹${evidence.actualReceived.toLocaleString("en-IN")}. Resulting Variance: ₹${evidence.difference.toLocaleString("en-IN")}. Status: ${evidence.status}.`,
+      },
+    ];
     if (evidence.difference === 0) {
-      reviewLogs.push({
+      rows.push({
+        payoutId: canonicalId,
         timestamp,
         action: "DISCREPANCY_RESOLVED",
         actor: "FINOVA Payout Truth Engine",
-        details: `Discrepancy 100% explained by verified evidence. Safety guardrail unlocked. General ledger voucher eligible for creation.`,
+        details: "Discrepancy 100% explained by verified evidence. Safety guardrail unlocked. General ledger voucher eligible for creation.",
       });
     }
-
-    sessionAuditStore.set(canonicalId, {
-      ...session,
-      reviewLogs,
-      verifiedAdjustment: {
-        amount: adjustment,
-        reference: investigation.evidence.find((e) => e.reference)?.reference || "GD-88421",
-        description: "Gateway Dispute Chargeback Withholding",
-      },
-    });
+    await prisma.payoutAuditLog.createMany({ data: rows });
 
     const updatedDetail = await this.getPayoutDetail(canonicalId);
     if (!updatedDetail) return null;
-
-    return {
-      payout: updatedDetail,
-      evidence,
-    };
+    return { payout: updatedDetail, evidence };
   }
 
   /**
-   * Create double-entry accounting entry for reconciled payout
-   * Enforces: "FINOVA refuses to book what it cannot explain."
-   * UNEXPLAINED PAYOUT -> NO ACCOUNTING ENTRY
+   * Create double-entry accounting entry for a reconciled payout. Enforces:
+   * "FINOVA refuses to book what it cannot explain." UNEXPLAINED PAYOUT -> NO ENTRY.
    */
   async createAccountingEntry(id: string, user: string = "Finance Controller"): Promise<PayoutDetail | null> {
     const canonicalId = resolveCanonicalId(id);
     const detail = await this.getPayoutDetail(canonicalId);
     if (!detail) return null;
 
-    // Rule: "FINOVA refuses to book what it cannot explain."
-    // UNEXPLAINED PAYOUT -> NO ACCOUNTING ENTRY
     if (detail.breakdown.difference !== 0) {
-      throw new Error(
-        `FINOVA refuses to book what it cannot explain. Discrepancy of ₹${detail.breakdown.difference.toLocaleString("en-IN")} remains unexplained at ledger reconciliation.`
-      );
+      throw new Error(`FINOVA refuses to book what it cannot explain. Discrepancy of ₹${detail.breakdown.difference.toLocaleString("en-IN")} remains unexplained at ledger reconciliation.`);
     }
-
     if (detail.status === "NEEDS_REVIEW") {
-      throw new Error(
-        "FINOVA refuses to book what it cannot explain. Discrepancy requires full mathematical reconciliation before ledger booking."
-      );
+      throw new Error("FINOVA refuses to book what it cannot explain. Discrepancy requires full mathematical reconciliation before ledger booking.");
     }
 
     const entryNum = `AE-2026-${detail.id.replace("PO-", "")}`;
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date();
 
-    const accountingEntry: AccountingEntry = {
-      ...detail.accountingEntry,
-      created: true,
-      entryNumber: entryNum,
-      createdAt: timestamp,
-      createdBy: user,
-      auditLog: [
-        ...detail.accountingEntry.auditLog,
-        {
-          timestamp,
-          action: "ACCOUNTING_ENTRY_CREATED",
-          actor: user,
-          details: `Created double-entry general ledger voucher ${entryNum} for ${detail.merchant} (${detail.id}). Total settled: ₹${detail.breakdown.actualBank.toLocaleString("en-IN")}.`,
-        },
-      ],
-    };
+    await prisma.payoutAccountingEntry.create({
+      data: {
+        payoutId: canonicalId,
+        entryNumber: entryNum,
+        createdBy: user,
+        createdAt: timestamp,
+        lines: { create: detail.accountingEntry.lines.map((l) => ({ type: l.type, accountCode: l.accountCode, accountName: l.accountName, amount: l.amount })) },
+      },
+    });
 
-    sessionAuditStore.set(canonicalId, {
-      ...sessionAuditStore.get(canonicalId),
-      accountingEntry,
+    await prisma.payoutAuditLog.create({
+      data: {
+        payoutId: canonicalId,
+        timestamp,
+        action: "ACCOUNTING_ENTRY_CREATED",
+        actor: user,
+        details: `Created double-entry general ledger voucher ${entryNum} for ${detail.merchant} (${detail.id}). Total settled: ₹${detail.breakdown.actualBank.toLocaleString("en-IN")}.`,
+      },
     });
 
     return this.getPayoutDetail(canonicalId);
   }
 
-  /**
-   * Handle human controller review actions
-   */
+  /** Handle human controller review actions */
   async submitReview(
     id: string,
     action: "APPROVE_EXPLANATION" | "APPROVE_RESOLUTION" | "REQUEST_EVIDENCE" | "ESCALATE" | "REJECT",
@@ -823,17 +811,13 @@ export class PayoutTruthService {
     fallbackUser: string = "Taksh (Finance Controller)"
   ): Promise<PayoutDetail | null> {
     const canonicalId = resolveCanonicalId(id);
-    const detail = await this.getPayoutDetail(canonicalId);
-    if (!detail) return null;
+    const existing = await prisma.payout.findUnique({ where: { id: canonicalId } });
+    if (!existing) return null;
 
-    const payload: ReviewSubmissionPayload =
-      typeof payloadOrNote === "string"
-        ? { action, note: payloadOrNote, user: fallbackUser }
-        : payloadOrNote;
+    const payload: ReviewSubmissionPayload = typeof payloadOrNote === "string" ? { action, note: payloadOrNote, user: fallbackUser } : payloadOrNote;
 
     const user = payload.user || fallbackUser;
-    const timestamp = new Date().toISOString();
-    let resolutionStatus: "PENDING" | "APPROVED" | "REJECTED" | "EVIDENCE_REQUESTED" | "ESCALATED" | "EXPLAINED" = "PENDING";
+    let resolutionStatus: NonNullable<HumanReviewData["resolutionStatus"]> = "PENDING";
     let reviewerNote = payload.explanation || payload.note || "";
     const evidenceReference = payload.evidenceReference || "";
     const requestedEvidence = payload.requestedEvidence || "";
@@ -847,56 +831,26 @@ export class PayoutTruthService {
       reviewerNote = reviewerNote || "Explanation recorded by controller.";
       auditAction = "EXPLANATION_SUBMITTED";
       auditDetails = `Human controller submitted explanation: "${reviewerNote}". Reference: "${evidenceReference || "None"}". Discrepancy remains pending Phase 2.2 evidence verification.`;
-
-      // Update Prisma exception status to IN_REVIEW
-      await prisma.exception.updateMany({
-        where: { payoutId: canonicalId },
-        data: { status: "IN_REVIEW" },
-      });
+      await prisma.exception.updateMany({ where: { payoutId: canonicalId }, data: { status: "IN_REVIEW" } });
     } else if (action === "REQUEST_EVIDENCE") {
       resolutionStatus = "EVIDENCE_REQUESTED";
       reviewerNote = requestedEvidence || reviewerNote || "Requested itemized fee & dispute statement via gateway API.";
       auditAction = "EVIDENCE_REQUESTED";
       auditDetails = `Controller requested itemized gateway evidence: "${reviewerNote}".`;
-
-      await prisma.exception.updateMany({
-        where: { payoutId: canonicalId },
-        data: { status: "IN_REVIEW" },
-      });
+      await prisma.exception.updateMany({ where: { payoutId: canonicalId }, data: { status: "IN_REVIEW" } });
     } else if (action === "ESCALATE" || action === "REJECT") {
       resolutionStatus = "ESCALATED";
       reviewerNote = escalationReason || reviewerNote || "Settlement escalated for formal gateway dispute / controller audit.";
       auditAction = "PAYOUT_ESCALATED";
       auditDetails = `Payout escalated for formal investigation: "${reviewerNote}".`;
-
-      await prisma.exception.updateMany({
-        where: { payoutId: canonicalId },
-        data: { status: "OPEN", severity: "CRITICAL" },
-      });
+      await prisma.exception.updateMany({ where: { payoutId: canonicalId }, data: { status: "OPEN", severity: "CRITICAL" } });
     }
 
-    const existing = sessionAuditStore.get(canonicalId) || {};
-    const reviewLogs = existing.reviewLogs || [];
-    reviewLogs.push({
-      timestamp,
-      action: auditAction,
-      actor: user,
-      details: auditDetails,
+    const timestamp = new Date();
+    await prisma.payoutReview.create({
+      data: { payoutId: canonicalId, action, resolutionStatus, reviewerName: user, reviewerNote, evidenceReference, requestedEvidence, escalationReason, createdAt: timestamp },
     });
-
-    sessionAuditStore.set(canonicalId, {
-      ...existing,
-      humanReviewState: {
-        resolutionStatus,
-        resolvedAt: timestamp,
-        reviewerNote,
-        evidenceReference,
-        requestedEvidence,
-        escalationReason,
-        reviewerName: user,
-      },
-      reviewLogs,
-    });
+    await prisma.payoutAuditLog.create({ data: { payoutId: canonicalId, timestamp, action: auditAction, actor: user, details: auditDetails } });
 
     return this.getPayoutDetail(canonicalId);
   }

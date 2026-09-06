@@ -3,7 +3,7 @@ import { workbenchService } from "@/lib/finance/workbenchService";
 
 export async function GET() {
   try {
-    const state = workbenchService.getState();
+    const state = await workbenchService.getState();
     return NextResponse.json({ success: true, state });
   } catch (error: any) {
     return NextResponse.json(
@@ -21,31 +21,31 @@ export async function POST(request: Request) {
     let updatedState;
     switch (action) {
       case "set_stage":
-        updatedState = workbenchService.setStage(payload?.stage || 1);
+        updatedState = await workbenchService.setStage(payload?.stage || 1);
         break;
       case "set_tab":
-        updatedState = workbenchService.setActiveTab(payload?.tab || "close");
+        updatedState = await workbenchService.setActiveTab(payload?.tab || "close");
         break;
       case "reconcile":
-        updatedState = workbenchService.runReconciliation();
+        updatedState = await workbenchService.runReconciliation();
         break;
       case "select_exception":
-        updatedState = workbenchService.selectException(payload?.id || "exc-cloudflare");
+        updatedState = await workbenchService.selectException(payload?.id || "exc-cloudflare");
         break;
       case "approve_entry":
-        updatedState = workbenchService.approveEntry(payload?.actor);
+        updatedState = await workbenchService.approveEntry(payload?.actor);
         break;
       case "backtest_policy":
-        updatedState = workbenchService.backtestPolicy();
+        updatedState = await workbenchService.backtestPolicy();
         break;
       case "activate_policy":
-        updatedState = workbenchService.activatePolicy(payload?.actor);
+        updatedState = await workbenchService.activatePolicy(payload?.actor);
         break;
       case "reset":
-        updatedState = workbenchService.reset();
+        updatedState = await workbenchService.reset();
         break;
       default:
-        updatedState = workbenchService.getState();
+        updatedState = await workbenchService.getState();
     }
 
     return NextResponse.json({ success: true, state: updatedState });

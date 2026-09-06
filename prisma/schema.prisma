@@ -1,12 +1,12 @@
 // Finova - Finance Operations Platform
-// Prisma Schema - SQLite for hackathon MVP
+// Prisma Schema - PostgreSQL
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -29,6 +29,7 @@ model Company {
   exceptions      Exception[]
   documents       Document[]
   payouts         Payout[]
+  workbenchRuns   WorkbenchRun[]
 }
 
 model User {
@@ -64,6 +65,9 @@ model Transaction {
   exceptionId String?
   payout      Payout?    @relation(fields: [payoutId], references: [id], onDelete: SetNull)
   payoutId    String?
+
+  @@index([companyId, date])
+  @@index([payoutId])
 }
 
 model Invoice {
@@ -85,6 +89,8 @@ model Invoice {
   company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
   exceptionId String?
+
+  @@index([companyId, status])
 }
 
 model PayrollRecord {
@@ -103,20 +109,24 @@ model PayrollRecord {
   company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
   exceptionId String?
+
+  @@index([companyId, period])
 }
 
 model CashFlowEntry {
-  id         String   @id @default(cuid())
-  date       DateTime
-  period     String   // "2025-08" for grouping
-  inflow     Float    @default(0)
-  outflow    Float    @default(0)
-  netFlow    Float    @default(0)
-  balance    Float    @default(0) // running balance
-  companyId  String
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  date      DateTime
+  period    String   // "2025-08" for grouping
+  inflow    Float    @default(0)
+  outflow   Float    @default(0)
+  netFlow   Float    @default(0)
+  balance   Float    @default(0) // running balance
+  companyId String
+  createdAt DateTime @default(now())
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, date])
 }
 
 model Exception {
@@ -131,12 +141,14 @@ model Exception {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  transactions    Transaction[]
-  invoices        Invoice[]
-  payrollRecords  PayrollRecord[]
-  payout          Payout?         @relation(fields: [payoutId], references: [id], onDelete: SetNull)
-  payoutId        String?
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions   Transaction[]
+  invoices       Invoice[]
+  payrollRecords PayrollRecord[]
+  payout         Payout?         @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  payoutId       String?
+
+  @@index([companyId, status])
 }
 
 model Payout {
@@ -158,9 +170,14 @@ model Payout {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-  exceptions   Exception[]
+  company         Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+  exceptions      Exception[]
+  evidence        PayoutEvidence[]
+  investigations  PayoutInvestigation[]
+  reviews         PayoutReview[]
+  accountingEntry PayoutAccountingEntry?
+  auditLogs       PayoutAuditLog[]
 }
 
 model Document {
@@ -175,4 +192,146 @@ model Document {
   updatedAt   DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================
+// PAYOUT TRUTH - persisted evidence, investigation, review,
+// accounting-entry and audit state (replaces the in-memory
+// sessionAuditStore Map that used to live in payoutService.ts).
+// ============================================================
+
+model PayoutEvidence {
+  id              String    @id @default(cuid())
+  payoutId        String
+  investigationId String?
+  category        String    // TRANSACTIONS | FEES | REFUNDS | TAXES | GATEWAY_DISPUTES | RESERVE_WITHHOLDING | BANK
+  label           String
+  status          String    // VERIFIED | MISMATCHED | WARNING | INFO | NOT_CHECKED | NO_MATCH | PARTIALLY_MATCHED
+  detail          String
+  amount          Float?
+  source          String?
+  reference       String?
+  metadata        Json?
+  verifiedAt      DateTime?
+  createdAt       DateTime  @default(now())
+
+  payout        Payout               @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  investigation PayoutInvestigation? @relation(fields: [investigationId], references: [id], onDelete: SetNull)
+
+  @@index([payoutId])
+}
+
+model PayoutInvestigation {
+  id                      String   @id @default(cuid())
+  payoutId                String
+  scenario                String?  // FULL | PARTIAL | NONE
+  originalExpected        Float
+  actualReceived          Float
+  originalVariance        Float
+  conclusion              String   // EXPLAINED | PARTIALLY_EXPLAINED | UNEXPLAINED
+  totalEvidenceDiscovered Float
+  remainingVariance       Float
+  applicableAdjustment    Float
+  notes                   String
+  investigatedAt          DateTime @default(now())
+
+  payout   Payout           @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  evidence PayoutEvidence[]
+
+  @@index([payoutId, investigatedAt])
+}
+
+model PayoutReview {
+  id                String   @id @default(cuid())
+  payoutId          String
+  action            String   // APPROVE_EXPLANATION | APPROVE_RESOLUTION | REQUEST_EVIDENCE | ESCALATE | REJECT
+  resolutionStatus  String   // PENDING | APPROVED | REJECTED | EVIDENCE_REQUESTED | ESCALATED | EXPLAINED
+  reviewerName      String
+  reviewerNote      String?
+  evidenceReference String?
+  requestedEvidence String?
+  escalationReason  String?
+  createdAt         DateTime @default(now())
+
+  payout Payout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+
+  @@index([payoutId, createdAt])
+}
+
+model PayoutAccountingEntry {
+  id          String   @id @default(cuid())
+  payoutId    String   @unique
+  entryNumber String
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  payout Payout                      @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  lines  PayoutAccountingEntryLine[]
+}
+
+model PayoutAccountingEntryLine {
+  id          String @id @default(cuid())
+  entryId     String
+  type        String // DEBIT | CREDIT
+  accountCode String
+  accountName String
+  amount      Float
+
+  entry PayoutAccountingEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@index([entryId])
+}
+
+model PayoutAuditLog {
+  id        String   @id @default(cuid())
+  payoutId  String
+  timestamp DateTime @default(now())
+  action    String
+  actor     String
+  details   String
+
+  payout Payout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+
+  @@index([payoutId, timestamp])
+}
+
+// ============================================================
+// CONTROLLER WORKBENCH - persisted run state and audit trail
+// (replaces the in-memory WorkbenchService singleton that used
+// to hold WorkbenchState directly on a class instance).
+// ============================================================
+
+model WorkbenchRun {
+  id                  String   @id @default("current")
+  companyId           String
+  stage               Int      @default(1)
+  activeTab           String   @default("close")
+  period              String   @default("September 2026")
+  reconciliationRun   Boolean  @default(false)
+  selectedExceptionId String   @default("exc-cloudflare")
+  entryApproved       Boolean  @default(false)
+  policyProposed      Boolean  @default(false)
+  policyBacktested    Boolean  @default(false)
+  policyActive        Boolean  @default(false)
+  octoberReplayed     Boolean  @default(false)
+  updatedAt           DateTime @updatedAt
+
+  company Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  events  WorkbenchAuditEvent[]
+}
+
+model WorkbenchAuditEvent {
+  id            String   @id @default(cuid())
+  runId         String
+  timestamp     DateTime @default(now())
+  actor         String
+  action        String
+  reason        String?
+  details       String
+  policyVersion String?
+  severity      String   @default("normal") // normal | success | warning | danger
+
+  run WorkbenchRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, timestamp])
 }
