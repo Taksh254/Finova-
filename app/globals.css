@@ -1,6 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&family=Caveat:wght@400..700&display=swap');
 
 :root {
+  /* Finova Luxury Hero Tokens */
+  --hero-bg-dark: #101411;
+  --hero-ivory: #F5F0E6;
+  --hero-sage: #7D8A72;
+  --hero-sage-light: rgba(125, 138, 114, 0.18);
+  --hero-gold: #C9A96E;
+  --hero-gold-hover: #D4B67C;
+  --hero-gold-glow: rgba(201, 169, 110, 0.25);
+  --hero-glass-bg: rgba(18, 23, 20, 0.68);
+  --hero-glass-border: rgba(245, 240, 230, 0.12);
+  --hero-glass-highlight: rgba(255, 255, 255, 0.09);
+  --font-serif: 'Playfair Display', 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-handwriting: 'Caveat', cursive;
+
   /* Finova Cream & Royal Blue Design System */
   --bg-app: #F7F3E8;
   --bg-surface: #FCFAF4;

@@ -1,379 +1,364 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
-  ShieldCheck,
-  TrendingUp,
   ArrowRight,
-  Sparkles,
-  CheckCircle2,
-  AlertTriangle,
-  FileCheck2,
-  Lock,
-  Layers,
+  Play,
+  ShieldCheck,
   Zap,
+  BarChart3,
+  Download,
+  Percent,
+  RotateCcw,
+  Receipt,
+  Coins,
+  Landmark,
+  CheckCircle2,
+  Search,
+  FileText,
+  AlertCircle,
 } from "lucide-react";
 import styles from "./HeroSection.module.css";
 
-type TabKey = "payout" | "cash" | "collections";
-
 export function HeroSection() {
-  const [activeTab, setActiveTab] = useState<TabKey>("payout");
-
   return (
-    <section className={styles.heroContainer} aria-label="FINOVA Overview">
+    <section className={styles.heroRoot} aria-label="Hero">
       <div className={styles.heroContent}>
-        {/* Retention Trust Badge */}
-        <div className={styles.retentionBadge}>
-          <span className={styles.retentionHighlight}>98.4% Retention</span>
-          <span>Trusted by 620+ High-Growth Indian SMEs & D2C Brands</span>
-        </div>
+        {/* ================= LEFT COLUMN ================= */}
+        <div className={styles.leftColumn}>
+          {/* Eyebrow */}
+          <div className={styles.eyebrow}>
+            <span>FROM TRANSACTIONS TO TRUST</span>
+          </div>
 
-        {/* Hero Title */}
-        <h1 className={styles.heroTitle}>
-          The Financial Operating System That Small Businesses{" "}
-          <span className={styles.gradientText}>Never Cancel.</span>
-        </h1>
+          {/* Editorial Headline */}
+          <h1 className={styles.headline}>
+            Every
+            <br />
+            payout has
+            <br />
+            a <span className={styles.goldText}>purpose.</span>
+          </h1>
 
-        {/* Hero Subtitle */}
-        <p className={styles.heroSubtitle}>
-          Small businesses bleed 2–4% of revenue to opaque payment gateway cuts,
-          delayed settlements, and payroll cash crunches. FINOVA reconciles every
-          single rupee autonomously, predicts your 18-day cash runway, and
-          protects your operating margin.
-        </p>
+          {/* Supporting Copy */}
+          <p className={styles.supportingCopy}>
+            FINOVA&apos;s <strong>Payout Truth</strong> reconciles merchant payouts,
+            explains every deduction, and posts accounting entries — while refusing
+            to book anything it cannot explain.
+          </p>
 
-        {/* Hero Action CTAs */}
-        <div className={styles.ctaRow}>
-          <Link href="/payout-truth" className={styles.primaryHeroBtn}>
-            <span>Launch Live Sandbox</span>
-            <ArrowRight size={18} strokeWidth={2} />
-          </Link>
-          <a href="#roi-calculator" className={styles.secondaryHeroBtn}>
-            <Zap size={18} color="var(--color-primary)" />
-            <span>Calculate Your Leakage</span>
-          </a>
-        </div>
+          {/* CTA Buttons */}
+          <div className={styles.ctaRow}>
+            <Link href="/payout-truth" className={styles.primaryCta}>
+              <span>Explore Payout Truth</span>
+              <ArrowRight size={16} strokeWidth={2.2} />
+            </Link>
 
-        {/* Micro Guarantee Proof */}
-        <div className={styles.proofMicroText}>
-          <CheckCircle2 size={15} className={styles.checkIcon} />
-          <span>No credit card required</span>
-          <span>•</span>
-          <CheckCircle2 size={15} className={styles.checkIcon} />
-          <span>Works with Razorpay, Stripe, Cashfree & Tally</span>
-          <span>•</span>
-          <CheckCircle2 size={15} className={styles.checkIcon} />
-          <span>Bank-grade 256-bit encryption</span>
-        </div>
+            <button type="button" className={styles.secondaryCta}>
+              <div className={styles.playIconCircle}>
+                <Play size={10} fill="#FFFFFF" />
+              </div>
+              <span>Watch Demo</span>
+            </button>
+          </div>
 
-        {/* Interactive Live FinOps Showcase */}
-        <div className={styles.showcaseWrapper}>
-          {/* Top Window Bar */}
-          <div className={styles.showcaseTopBar}>
-            <div className={styles.windowControls} aria-hidden="true">
-              <span className={styles.dotRed} />
-              <span className={styles.dotYellow} />
-              <span className={styles.dotGreen} />
+          {/* Small Trust Indicators */}
+          <div className={styles.trustIndicatorsGrid}>
+            <div className={styles.trustItem}>
+              <div className={styles.trustIconCircle}>
+                <ShieldCheck size={18} strokeWidth={1.8} />
+              </div>
+              <div className={styles.trustMeta}>
+                <span className={styles.trustTitle}>Audit Ready</span>
+                <span className={styles.trustSubtext}>
+                  Every transaction accounted for
+                </span>
+              </div>
             </div>
 
-            <div className={styles.tabsContainer} role="tablist">
-              <button
-                role="tab"
-                aria-selected={activeTab === "payout"}
-                className={`${styles.tabButton} ${
-                  activeTab === "payout" ? styles.tabButtonActive : ""
-                }`}
-                onClick={() => setActiveTab("payout")}
-              >
-                <ShieldCheck size={16} />
-                <span>Payout Truth Engine</span>
-              </button>
+            <div className={styles.trustItem}>
+              <div className={styles.trustIconCircle}>
+                <Zap size={18} strokeWidth={1.8} />
+              </div>
+              <div className={styles.trustMeta}>
+                <span className={styles.trustTitle}>Built for India</span>
+                <span className={styles.trustSubtext}>
+                  INR native, compliance first
+                </span>
+              </div>
+            </div>
 
-              <button
-                role="tab"
-                aria-selected={activeTab === "cash"}
-                className={`${styles.tabButton} ${
-                  activeTab === "cash" ? styles.tabButtonActive : ""
-                }`}
-                onClick={() => setActiveTab("cash")}
-              >
-                <TrendingUp size={16} />
-                <span>18-Day Cash Radar</span>
-              </button>
+            <div className={styles.trustItem}>
+              <div className={styles.trustIconCircle}>
+                <BarChart3 size={18} strokeWidth={1.8} />
+              </div>
+              <div className={styles.trustMeta}>
+                <span className={styles.trustTitle}>Finance Teams</span>
+                <span className={styles.trustSubtext}>
+                  Move faster from data to decisions
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-              <button
-                role="tab"
-                aria-selected={activeTab === "collections"}
-                className={`${styles.tabButton} ${
-                  activeTab === "collections" ? styles.tabButtonActive : ""
-                }`}
-                onClick={() => setActiveTab("collections")}
+        {/* ================= RIGHT COLUMN ================= */}
+        <div className={styles.rightColumn}>
+          {/* Handwritten Annotation Note */}
+          <div className={styles.annotationWrapper} aria-hidden="true">
+            <span className={styles.handwrittenNote}>
+              From payouts to possibilities.
+            </span>
+            <svg
+              className={styles.handwrittenArrow}
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8 8 C 22 10, 30 22, 24 34 M 18 30 L 24 34 L 28 26"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          {/* Floating Glass Payout Cards Stack */}
+          <div className={styles.cardsStack}>
+            {/* FRONT CARD: Payout #PO-1024 (Reconciled) */}
+            <div className={styles.primaryCard}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardHeaderLeft}>
+                  <div className={styles.cardTitle}>Payout #PO-1024</div>
+                  <div className={styles.cardSubtitle}>
+                    RazorPay • Arcova Technologies
+                  </div>
+                </div>
+                <div className={styles.cardHeaderRight}>
+                  <span className={styles.badgeReconciled}>Reconciled</span>
+                  <span className={styles.dateLabel}>12 Aug 2026</span>
+                </div>
+              </div>
+
+              <div className={styles.itemsList}>
+                <div className={styles.lineItem}>
+                  <div className={styles.lineItemLabel}>
+                    <div className={styles.itemIconBox}>
+                      <Download size={13} strokeWidth={2} />
+                    </div>
+                    <span>Gross Sales</span>
+                  </div>
+                  <span className={`${styles.lineItemValue} tabular-nums`}>
+                    ₹10,00,000
+                  </span>
+                </div>
+
+                <div className={styles.lineItem}>
+                  <div className={styles.lineItemLabel}>
+                    <div className={styles.itemIconBox}>
+                      <Percent size={13} strokeWidth={2} />
+                    </div>
+                    <span>Platform Fees</span>
+                  </div>
+                  <span className={`${styles.lineItemValue} ${styles.valueDeduction} tabular-nums`}>
+                    - ₹20,000
+                  </span>
+                </div>
+
+                <div className={styles.lineItem}>
+                  <div className={styles.lineItemLabel}>
+                    <div className={styles.itemIconBox}>
+                      <RotateCcw size={13} strokeWidth={2} />
+                    </div>
+                    <span>Refunds</span>
+                  </div>
+                  <span className={`${styles.lineItemValue} ${styles.valueDeduction} tabular-nums`}>
+                    - ₹15,000
+                  </span>
+                </div>
+
+                <div className={styles.lineItem}>
+                  <div className={styles.lineItemLabel}>
+                    <div className={styles.itemIconBox}>
+                      <Receipt size={13} strokeWidth={2} />
+                    </div>
+                    <span>Taxes (GST)</span>
+                  </div>
+                  <span className={`${styles.lineItemValue} ${styles.valueDeduction} tabular-nums`}>
+                    - ₹5,000
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.dividerLine} />
+
+              <div className={styles.summaryRow}>
+                <div className={styles.summaryLabel}>
+                  <div className={styles.itemIconBox}>
+                    <Coins size={13} strokeWidth={2} />
+                  </div>
+                  <span>Expected Payout</span>
+                </div>
+                <span className={`${styles.summaryValueGold} tabular-nums`}>
+                  ₹9,60,000
+                </span>
+              </div>
+
+              <div className={styles.summaryRow}>
+                <div className={styles.summaryLabel}>
+                  <div className={styles.itemIconBox}>
+                    <Landmark size={13} strokeWidth={2} />
+                  </div>
+                  <span>Bank Received</span>
+                </div>
+                <span className={`${styles.summaryValue} tabular-nums`}>
+                  ₹9,60,000
+                </span>
+              </div>
+
+              <div className={styles.cardFooter}>
+                <div className={styles.statusExplained}>
+                  <CheckCircle2 size={15} strokeWidth={2.2} />
+                  <span>Every amount explained</span>
+                </div>
+                <Link
+                  href="/payout-truth/po_rzp_4081"
+                  className={styles.detailsLink}
+                >
+                  <span>View Details</span>
+                  <span>→</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* BEHIND CARD: Payout #PO-1025 (Needs Review) */}
+            <div className={styles.secondaryCard}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardHeaderLeft}>
+                  <div className={styles.cardTitle} style={{ fontSize: "16px" }}>
+                    Payout #PO-1025
+                  </div>
+                  <div className={styles.cardSubtitle}>
+                    RazorPay • Arcova
+                  </div>
+                </div>
+                <div className={styles.cardHeaderRight}>
+                  <span className={styles.badgeWarning}>Needs Review</span>
+                  <span className={styles.dateLabel}>14 Aug 2026</span>
+                </div>
+              </div>
+
+              <div className={styles.itemsList} style={{ gap: "8px" }}>
+                <div className={styles.lineItem} style={{ fontSize: "12px" }}>
+                  <span style={{ color: "rgba(245, 240, 230, 0.65)" }}>
+                    Expected Payout
+                  </span>
+                  <span className="tabular-nums" style={{ fontWeight: 600 }}>
+                    ₹9,60,000
+                  </span>
+                </div>
+
+                <div className={styles.lineItem} style={{ fontSize: "12px" }}>
+                  <span style={{ color: "rgba(245, 240, 230, 0.65)" }}>
+                    Bank Received
+                  </span>
+                  <span className="tabular-nums" style={{ fontWeight: 600 }}>
+                    ₹9,42,000
+                  </span>
+                </div>
+              </div>
+
+              {/* Warning box */}
+              <div className={styles.warningBox}>
+                <span className={styles.warningBoxLabel}>Unexplained Amount</span>
+                <span className={`${styles.warningBoxValue} tabular-nums`}>
+                  ₹18,000
+                </span>
+              </div>
+
+              <Link
+                href="/payout-truth/po_str_9140"
+                className={styles.investigateBtn}
               >
-                <Zap size={16} />
-                <span>Smart Receivables</span>
-              </button>
+                <span>Investigate</span>
+                <span>→</span>
+              </Link>
             </div>
           </div>
 
-          {/* Showcase Body Content */}
-          <div className={styles.showcaseBody}>
-            {activeTab === "payout" && (
-              <div>
-                <div className={styles.previewHeader}>
-                  <div className={styles.previewMeta}>
-                    <div className={styles.previewTitle}>
-                      <span>Razorpay Batch #PO-RZP-8842</span>
-                      <span className={`${styles.statusTag} ${styles.statusGreen}`}>
-                        ✓ Reconciled to Last Rupee
-                      </span>
-                    </div>
-                    <span className={styles.previewSubtitle}>
-                      Settlement Period: Yesterday, 23:59 IST • 482 Underlying Transactions Verified
-                    </span>
-                  </div>
-                  <Link href="/payout-truth" className={styles.actionLinkBtn}>
-                    View In Sandbox →
-                  </Link>
-                </div>
-
-                <div className={styles.metricsGrid}>
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Gross Merchant Volume</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`}>
-                      ₹8,45,000.00
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.noteMuted}`}>
-                      482 client payments
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Standard Gateway Fee</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`}>
-                      -₹16,900.00
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.noteMuted}`}>
-                      2.00% agreed contract rate
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>GST On MDR (18%)</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`}>
-                      -₹3,042.00
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.noteMuted}`}>
-                      ITC eligible input credit
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Net Bank Deposit</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`} style={{ color: "var(--color-primary)" }}>
-                      ₹8,25,058.00
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.notePositive}`}>
-                      HDFC ••••9104 Verified
-                    </span>
-                  </div>
-                </div>
-
-                <div className={`${styles.showcaseAlert} ${styles.alertWarning}`}>
-                  <AlertTriangle size={20} style={{ flexShrink: 0, marginTop: 2 }} />
-                  <div className={styles.alertContent}>
-                    <div className={styles.alertTitle}>
-                      Autonomous AI Leakage Protection Active
-                    </div>
-                    <div className={styles.alertDesc}>
-                      FINOVA detected <strong>₹1,420 excess fee</strong> charged on 3 international corporate cards. Dispute package pre-compiled with gateway ticket ref #RZP-DISP-4109 and auto-credited to pending ledger.
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.showcaseFooter}>
-                  <div className={styles.showcaseFooterLeft}>
-                    <Lock size={15} />
-                    <span>Cryptographically verified against bank settlement UTR & gateway webhook logs</span>
-                  </div>
-                  <Link href="/payout-truth" className={styles.actionLinkBtn}>
-                    Explore Full Flagship Flow
-                  </Link>
-                </div>
+          {/* Subtle Glass Workflow Strip (Below Cards) */}
+          <div className={styles.workflowStrip} aria-label="Payout Truth Workflow">
+            <div className={styles.workflowStep}>
+              <div className={styles.stepIconCircle}>
+                <Download size={14} strokeWidth={2} />
               </div>
-            )}
-
-            {activeTab === "cash" && (
-              <div>
-                <div className={styles.previewHeader}>
-                  <div className={styles.previewMeta}>
-                    <div className={styles.previewTitle}>
-                      <span>18-Day Forward Cash Runway Forecast</span>
-                      <span className={`${styles.statusTag} ${styles.statusBlue}`}>
-                        AI Confidence: 99.1%
-                      </span>
-                    </div>
-                    <span className={styles.previewSubtitle}>
-                      Live telemetry connected across HDFC Current Account, ICICI Tax Reserve, and Razorpay
-                    </span>
-                  </div>
-                  <Link href="/cash-flow" className={styles.actionLinkBtn}>
-                    View Cash Flow →
-                  </Link>
-                </div>
-
-                <div className={styles.metricsGrid}>
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Liquid Cash Balance</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`}>
-                      ₹24,80,450
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.notePositive}`}>
-                      Combined 2 operating banks
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>18-Day Outflows (Payroll + Rent)</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`} style={{ color: "var(--color-negative)" }}>
-                      -₹12,40,000
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.noteNegative}`}>
-                      Payroll in 9 days (₹8.2L)
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Guaranteed Inflows</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`} style={{ color: "var(--color-positive)" }}>
-                      +₹9,10,000
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.notePositive}`}>
-                      8 high-intent contracts
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Projected Safe Cushion</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`} style={{ color: "var(--color-primary)" }}>
-                      ₹21,50,450
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.notePositive}`}>
-                      Zero overdraft risk detected
-                    </span>
-                  </div>
-                </div>
-
-                <div className={`${styles.showcaseAlert} ${styles.alertSuccess}`}>
-                  <Sparkles size={20} style={{ flexShrink: 0, marginTop: 2 }} />
-                  <div className={styles.alertContent}>
-                    <div className={styles.alertTitle}>
-                      Runway Health: 5.6 Months • No Payroll Anxiety
-                    </div>
-                    <div className={styles.alertDesc}>
-                      FINOVA simulated 100 scenario permutations. Even in a 30% late-payment scenario, salary buffer remains intact by 14 days without requiring credit lines.
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.showcaseFooter}>
-                  <div className={styles.showcaseFooterLeft}>
-                    <TrendingUp size={15} />
-                    <span>Calculates burn rate, tax withholding, and vendor credit terms automatically</span>
-                  </div>
-                  <Link href="/overview" className={styles.actionLinkBtn}>
-                    Open Dashboard Radar
-                  </Link>
-                </div>
+              <div className={styles.stepLabelCol}>
+                <span className={styles.stepNumber}>01</span>
+                <span className={styles.stepTitle}>Receive Payout</span>
               </div>
-            )}
+            </div>
 
-            {activeTab === "collections" && (
-              <div>
-                <div className={styles.previewHeader}>
-                  <div className={styles.previewMeta}>
-                    <div className={styles.previewTitle}>
-                      <span>Autonomous Accounts Receivable & Dunning</span>
-                      <span className={`${styles.statusTag} ${styles.statusGreen}`}>
-                        38% Faster DSO
-                      </span>
-                    </div>
-                    <span className={styles.previewSubtitle}>
-                      Gentle, branded WhatsApp and email reminders triggered precisely when client finance teams run payment runs
-                    </span>
-                  </div>
-                  <Link href="/invoices" className={styles.actionLinkBtn}>
-                    View Invoices →
-                  </Link>
-                </div>
+            <span className={styles.stepArrow}>→</span>
 
-                <div className={styles.metricsGrid}>
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Total Monitored AR</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`}>
-                      ₹18,50,000
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.noteMuted}`}>
-                      24 active SME clients
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Recovered This Week</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`} style={{ color: "var(--color-positive)" }}>
-                      ₹6,20,000
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.notePositive}`}>
-                      5 invoices settled in 48h
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Overdue Invoices (&gt;30d)</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`} style={{ color: "var(--color-warning)" }}>
-                      ₹1,40,000
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.noteNegative}`}>
-                      Down from ₹5.8L last month
-                    </span>
-                  </div>
-
-                  <div className={styles.metricCard}>
-                    <span className={styles.metricCardLabel}>Founder Hours Saved</span>
-                    <span className={`${styles.metricCardValue} tabular-nums`} style={{ color: "var(--color-primary)" }}>
-                      16.5 hrs/mo
-                    </span>
-                    <span className={`${styles.metricCardNote} ${styles.notePositive}`}>
-                      Zero awkward manual followups
-                    </span>
-                  </div>
-                </div>
-
-                <div className={`${styles.showcaseAlert} ${styles.alertBlue}`}>
-                  <FileCheck2 size={20} style={{ flexShrink: 0, marginTop: 2 }} />
-                  <div className={styles.alertContent}>
-                    <div className={styles.alertTitle}>
-                      AI Tone Matching: High Conversion, Zero Damaged Relationships
-                    </div>
-                    <div className={styles.alertDesc}>
-                      Unlike aggressive collections bots, FINOVA uses professional, courteous payment reminders that clients actually respond to—delivering 94% on-time settlement.
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.showcaseFooter}>
-                  <div className={styles.showcaseFooterLeft}>
-                    <Zap size={15} />
-                    <span>Includes 1-click UPI & NEFT payment links embedded in every reminder</span>
-                  </div>
-                  <Link href="/invoices" className={styles.actionLinkBtn}>
-                    Explore Invoices Engine
-                  </Link>
-                </div>
+            <div className={styles.workflowStep}>
+              <div className={styles.stepIconCircle}>
+                <Search size={14} strokeWidth={2} />
               </div>
-            )}
+              <div className={styles.stepLabelCol}>
+                <span className={styles.stepNumber}>02</span>
+                <span className={styles.stepTitle}>Reconcile</span>
+              </div>
+            </div>
+
+            <span className={styles.stepArrow}>→</span>
+
+            <div className={styles.workflowStep}>
+              <div className={styles.stepIconCircle}>
+                <FileText size={14} strokeWidth={2} />
+              </div>
+              <div className={styles.stepLabelCol}>
+                <span className={styles.stepNumber}>03</span>
+                <span className={styles.stepTitle}>Explain</span>
+              </div>
+            </div>
+
+            <span className={styles.stepArrow}>→</span>
+
+            <div className={styles.workflowStep}>
+              <div className={styles.stepIconCircle}>
+                <CheckCircle2 size={14} strokeWidth={2} />
+              </div>
+              <div className={styles.stepLabelCol}>
+                <span className={styles.stepNumber}>04</span>
+                <span className={styles.stepTitle}>Book / Escalate</span>
+              </div>
+            </div>
+
+            <span className={styles.stepArrow}>→</span>
+
+            <div className={styles.workflowStep}>
+              <div className={styles.stepIconCircle}>
+                <ShieldCheck size={14} strokeWidth={2} />
+              </div>
+              <div className={styles.stepLabelCol}>
+                <span className={styles.stepNumber}>05</span>
+                <span className={styles.stepTitle}>Audit</span>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Subtle Bottom Metadata Ticker */}
+      <div className={styles.bottomTickerBar}>
+        <div>
+          BUILT FOR INDIA &nbsp;|&nbsp; DESIGNED FOR FINANCE TEAMS &nbsp;|&nbsp; POWERED BY DETERMINISTIC FINOPS —
+        </div>
+        <div className={styles.tickerRight}>
+          TRUST TURNS TRANSACTIONS INTO GROWTH.
         </div>
       </div>
     </section>
