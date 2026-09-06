@@ -16,7 +16,7 @@ To keep this README honest as the product evolves, here's what's real vs. presen
 | Payout Truth (`/payout-truth`) — list, detail, investigate, reconcile, review, accounting entry, audit log | ✅ Live — full CRUD against Postgres via Prisma |
 | Controller Workbench (`/overview` — exception → investigation → correction → policy → close-run → replay → audit) | ✅ Live — persisted stage machine (`WorkbenchRun`). Note: despite the URL, this route renders the Workbench, not a metrics dashboard |
 | Exceptions register (`/exceptions`) | ✅ Live — server-rendered directly from Prisma |
-| Accounts, Cash Flow, Expenses, Invoices, Payroll, Reports, Settings, Transactions, Treasury, Reconciliation, AI CFO, Help | 🚧 Placeholder "coming soon" screens (`ModulePlaceholder`) — no real data yet |
+| Accounts, Expenses, Invoices, Payroll, Reports, Settings, Transactions, Treasury, Reconciliation, AI CFO, Help | 🚧 Placeholder "coming soon" screens (`ModulePlaceholder`) — no real data yet |
 
 ---
 
@@ -109,18 +109,18 @@ finova-app/
 │   │   │   └── [id]/               # Payout detail: evidence, investigation, review, entry, audit
 │   │   ├── exceptions/             # Exceptions register (server-rendered from Prisma)
 │   │   ├── ai-agents/              # AI agent panel
-│   │   ├── reconciliation/, transactions/, invoices/, expenses/, cash-flow/,
+│   │   ├── reconciliation/, transactions/, invoices/, expenses/,
 │   │   │                          # accounts/, reports/, ai-cfo/, payroll/, treasury/,
 │   │   │                          # help/, settings/ — placeholder screens, no real data
 │   │   └── layout.tsx
 │   └── api/
-│       ├── dashboard/{overview,activity,cashflow,exceptions}/
+│       ├── dashboard/{overview,activity,exceptions}/
 │       ├── payouts/                # GET list; GET/[id]; POST reconcile/investigate/
 │       │                           # rerun-reconciliation/review/accounting-entry
 │       └── workbench/              # Controller Workbench state machine
 ├── components/
 │   ├── landing/                    # Marketing page sections (Editorial* components)
-│   ├── dashboard/                  # MetricCard, CashFlowChart, AICFOCommandCard,
+│   ├── dashboard/                  # MetricCard, AICFOCommandCard,
 │   │                                # FinancialHealthCard, ExceptionsPanel, etc.
 │   ├── payout/                     # PayoutDetailView, PayoutTruthClient
 │   ├── workbench/                  # WorkbenchShell + 8 stage components
