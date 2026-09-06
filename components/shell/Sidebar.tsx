@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  ShieldCheck,
   ArrowLeftRight,
   FileText,
   Receipt,
@@ -35,6 +36,7 @@ const navSections: NavSection[] = [
   {
     items: [
       { label: "Overview", href: "/overview", icon: LayoutDashboard },
+      { label: "Payout Truth", href: "/payout-truth", icon: ShieldCheck, badge: "Flagship", badgeType: "ai" },
     ],
   },
   {
