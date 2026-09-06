@@ -1,0 +1,369 @@
+.realExampleSection {
+  position: relative;
+  background: var(--bg-editorial-ivory);
+  padding: 6.5rem 2.5rem 7.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.sectionContainer {
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.85fr 2fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+/* ================= LEFT COLUMN ================= */
+.leftCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  font-family: var(--font-sans-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-sage-accent);
+  margin-bottom: 1.25rem;
+}
+
+.headline {
+  font-family: var(--font-serif-display), 'Newsreader', Georgia, serif;
+  font-size: clamp(2.6rem, 3.8vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--color-forest-deep);
+  margin: 0 0 2rem 0;
+}
+
+.exploreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-forest-pill);
+  color: #ffffff;
+  padding: 0.75rem 1.65rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans-body);
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-decoration: none;
+  width: fit-content;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.4),
+    0 6px 18px rgba(18, 31, 23, 0.22);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.exploreBtn:hover {
+  background: var(--color-forest-hover);
+  transform: translateY(-1.5px);
+  box-shadow: 0 8px 24px rgba(18, 31, 23, 0.3);
+}
+
+/* ================= RIGHT: 2 FLOATING GLASS CARDS WITH ARROW ================= */
+.cardsWrapper {
+  display: grid;
+  grid-template-columns: 1fr auto 1.08fr;
+  gap: 1.5rem;
+  align-items: center;
+  position: relative;
+}
+
+/* Card 1: Exception Card */
+.exceptionCard {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 22px;
+  padding: 1.85rem 1.75rem;
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 #ffffff,
+    0 16px 40px -8px rgba(18, 31, 23, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.24s ease;
+}
+
+.exceptionCard:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.cardHeaderTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.vendorHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.vendorIconCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(240, 237, 230, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-forest-deep);
+}
+
+.vendorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.vendorTitle {
+  font-family: var(--font-sans-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-forest-deep);
+}
+
+.vendorAmountRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.vendorAmount {
+  font-family: var(--font-mono-numbers);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--color-forest-deep);
+}
+
+.vendorDate {
+  font-size: 0.7rem;
+  color: var(--text-editorial-muted);
+}
+
+.unmatchedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  color: #b91c1c;
+  font-family: var(--font-sans-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+}
+
+/* Checklist Details inside Card 1 */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.checkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--color-forest-deep);
+}
+
+.checkIconCircle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-cleared-green);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.checkSubText {
+  font-family: var(--font-mono-numbers);
+  font-size: 0.72rem;
+  color: var(--text-editorial-muted);
+  margin-top: 1px;
+}
+
+/* Journal Entry Box inside Card 1 */
+.journalEntryBox {
+  background: rgba(245, 242, 235, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  margin-top: 0.35rem;
+  font-family: var(--font-mono-numbers);
+  font-size: 0.74rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.journalDr {
+  color: #1e3a29;
+  display: flex;
+  justify-content: space-between;
+}
+
+.journalCr {
+  color: #554836;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 0.85rem;
+}
+
+/* Curved Connector Arrow between Card 1 and Card 2 */
+.curvedArrowContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-sage-accent);
+}
+
+/* Card 2: Policy for Future Transactions Card */
+.policyCard {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 22px;
+  padding: 1.85rem 1.75rem;
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 #ffffff,
+    0 16px 40px -8px rgba(18, 31, 23, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.24s ease;
+}
+
+.policyCard:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.policyHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.policyTitleTag {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans-body);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-forest-deep);
+}
+
+.proposedBadge {
+  font-family: var(--font-mono-numbers);
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 2px 7px;
+  border-radius: 9999px;
+  letter-spacing: 0.06em;
+}
+
+.policyHeadline {
+  font-family: var(--font-sans-body);
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--color-forest-deep);
+  margin-bottom: 1.25rem;
+}
+
+/* Key-Value Attributes Grid */
+.attributesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem 1rem;
+  background: rgba(245, 242, 235, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.attrItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.attrLabel {
+  font-size: 0.68rem;
+  color: var(--text-editorial-muted);
+}
+
+.attrValue {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-forest-deep);
+}
+
+.policyActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-forest-pill);
+  color: #ffffff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.35);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.policyActionBtn:hover {
+  background: var(--color-forest-hover);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1100px) {
+  .sectionContainer {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .cardsWrapper {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .curvedArrowContainer {
+    transform: rotate(90deg);
+  }
+}

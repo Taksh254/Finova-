@@ -1,0 +1,472 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stageHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+}
+
+.stageEyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-forest-medium);
+  margin-bottom: 0.35rem;
+}
+
+.stageTitle {
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
+  font-weight: 500;
+  color: var(--color-charcoal-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.stageSubtitle {
+  font-size: 0.88rem;
+  color: var(--text-editorial-muted);
+  margin-top: 0.25rem;
+}
+
+/* Apple-style Physical Glass Button */
+.runReconBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: linear-gradient(180deg, rgba(28, 52, 38, 0.95) 0%, rgba(16, 28, 20, 0.98) 100%);
+  color: #ffffff;
+  padding: 0.75rem 1.65rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(16px);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.38),
+    0 6px 18px rgba(18, 31, 23, 0.25);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.runReconBtn:hover {
+  background: linear-gradient(180deg, rgba(38, 70, 50, 0.98) 0%, rgba(22, 38, 28, 1) 100%);
+  transform: translateY(-1.5px);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.55),
+    0 8px 24px rgba(18, 31, 23, 0.32);
+}
+
+.runReconBtn:active {
+  transform: scale(0.985);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Stat Cards Grid — Level 3 Glass Surfaces */
+.statGrid {
+  display: grid;
+  grid-template-columns: 1.25fr 1.25fr 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  padding: 1.25rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 24px -4px rgba(18, 31, 23, 0.06);
+  transition: all 0.2s ease;
+}
+
+.statCard:hover {
+  background: rgba(255, 255, 255, 0.78);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    0 12px 30px -4px rgba(18, 31, 23, 0.1);
+}
+
+.statCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.cardLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-forest-dark);
+}
+
+.loadedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-cleared-green);
+  background: rgba(30, 94, 63, 0.1);
+  border: 1px solid rgba(30, 94, 63, 0.18);
+  backdrop-filter: blur(12px);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.8);
+}
+
+.fileName {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-editorial-muted);
+  margin-bottom: 0.25rem;
+}
+
+.txCount {
+  font-size: 0.74rem;
+  color: var(--color-charcoal-primary);
+  font-weight: 500;
+}
+
+.metricBig {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--color-charcoal-primary);
+  margin-bottom: 0.35rem;
+}
+
+.metricExceptions {
+  color: var(--color-exception-red);
+}
+
+.metricMatched {
+  color: var(--color-cleared-green);
+}
+
+.metricLabel {
+  font-size: 0.78rem;
+  color: var(--text-editorial-muted);
+  font-weight: 500;
+}
+
+/* Bottom Split */
+.bottomSplit {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.5rem;
+}
+
+.activityBox {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 28px -4px rgba(18, 31, 23, 0.06);
+}
+
+.boxTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-forest-dark);
+  margin-bottom: 1rem;
+}
+
+.activityTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.activityTable td {
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--color-charcoal-primary);
+}
+
+.timeCol {
+  font-family: var(--font-mono);
+  color: var(--text-editorial-muted);
+  width: 60px;
+}
+
+.expensesCard {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 1.5rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 28px -4px rgba(18, 31, 23, 0.06);
+  transition: all 0.2s ease;
+}
+
+.expensesCard:hover {
+  background: rgba(255, 255, 255, 0.76);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 1px 0 #ffffff,
+    0 12px 32px -4px rgba(18, 31, 23, 0.09);
+}
+
+.expensesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.expensesTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-forest-dark);
+  letter-spacing: 0.01em;
+}
+
+.viewDetailsBtn {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-forest-medium);
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
+.viewDetailsBtn:hover {
+  color: var(--color-forest-dark);
+  transform: translateX(2px);
+}
+
+.metricSection {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.primaryMetric {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--color-charcoal-primary);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.indicatorWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.greenIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #059669;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  padding: 1px 6px;
+  border-radius: 9999px;
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.8);
+}
+
+.vsText {
+  font-size: 0.72rem;
+  color: var(--text-editorial-muted);
+  font-weight: 500;
+}
+
+/* Subtle Horizontal Spending Breakdown Bar */
+.breakdownBar {
+  height: 6px;
+  border-radius: 9999px;
+  overflow: hidden;
+  display: flex;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.1rem;
+}
+
+.segmentSoftware {
+  width: 38%;
+  background: #143623;
+  border-radius: 9999px 0 0 9999px;
+}
+
+.segmentPayroll {
+  width: 25%;
+  background: #276241;
+}
+
+.segmentOperations {
+  width: 21%;
+  background: #508d6a;
+}
+
+.segmentOther {
+  width: 16%;
+  background: #b2c9bb;
+  border-radius: 0 9999px 9999px 0;
+}
+
+/* Categories Breakdown List */
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem 1.25rem;
+  margin-bottom: 1.15rem;
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+}
+
+.categoryLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoryDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotSoftware {
+  background: #143623;
+}
+
+.dotPayroll {
+  background: #276241;
+}
+
+.dotOperations {
+  background: #508d6a;
+}
+
+.dotOther {
+  background: #b2c9bb;
+}
+
+.categoryName {
+  color: var(--color-charcoal-primary);
+  font-weight: 500;
+  font-size: 0.76rem;
+}
+
+.categoryRight {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.categoryAmount {
+  font-weight: 600;
+  color: var(--color-charcoal-primary);
+}
+
+.categoryPercent {
+  color: var(--text-editorial-muted);
+  font-size: 0.68rem;
+}
+
+/* Small Secondary Glass Area at the Bottom */
+.secondaryGlassFooter {
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 0.65rem 0.95rem;
+  box-shadow: inset 0 1px 0.5px #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footerColLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.glassFooterLead {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-forest-dark);
+}
+
+.glassFooterSub {
+  font-size: 0.7rem;
+  color: var(--text-editorial-muted);
+}
+
+@media (max-width: 1024px) {
+  .statGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .bottomSplit {
+    grid-template-columns: 1fr;
+  }
+}

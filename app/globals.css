@@ -1,91 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&family=Caveat:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&display=swap');
 
 :root {
-  /* Finova Luxury Hero Tokens */
-  --hero-bg-dark: #101411;
-  --hero-ivory: #F5F0E6;
-  --hero-sage: #7D8A72;
-  --hero-sage-light: rgba(125, 138, 114, 0.18);
-  --hero-gold: #C9A96E;
-  --hero-gold-hover: #D4B67C;
-  --hero-gold-glow: rgba(201, 169, 110, 0.25);
-  --hero-glass-bg: rgba(18, 23, 20, 0.68);
-  --hero-glass-border: rgba(245, 240, 230, 0.12);
-  --hero-glass-highlight: rgba(255, 255, 255, 0.09);
-  --font-serif: 'Playfair Display', 'Newsreader', Georgia, 'Times New Roman', serif;
-  --font-handwriting: 'Caveat', cursive;
+  /* Finova Editorial Luxury Tokens */
+  --bg-editorial-ivory: #FAF8F4;
+  --bg-editorial-subtle: #F5F2EB;
+  --bg-editorial-surface: #FCFAF6;
+  --bg-editorial-elevated: #FFFFFF;
+  --bg-editorial-muted: #EFEAE0;
 
-  /* Finova Cream & Royal Blue Design System */
-  --bg-app: #F7F3E8;
-  --bg-surface: #FCFAF4;
-  --bg-section: #EEE9DC;
-  --bg-card: #FFFFFF;
-  --bg-card-hover: #FAF8F2;
-  --bg-card-alt: #F8F5EC;
-  --bg-input: #FFFFFF;
-  --bg-badge: #F1ECE0;
+  /* Primary Brand - Deep Forest Green */
+  --color-forest-deep: #121F17;
+  --color-forest-rich: #17281E;
+  --color-forest-surface: #1E3327;
+  --color-forest-hover: #233B2E;
+  --color-forest-pill: #16261D;
+  --color-forest-border: rgba(23, 40, 30, 0.12);
+  --color-forest-text-subtle: #415A4B;
+  --color-forest-italic: #2D553D;
 
-  /* Primary Brand - Royal Blue */
-  --color-primary: #1D3B8F;
-  --color-primary-deep: #142A68;
-  --color-primary-hover: #162E73;
-  --color-primary-subtle: rgba(29, 59, 143, 0.08);
-  --color-primary-light: #EEF2FF;
-  --color-primary-border: rgba(29, 59, 143, 0.2);
+  /* Apple Glass & Frosted Glass Tokens */
+  --glass-capsule-bg: rgba(255, 255, 255, 0.68);
+  --glass-capsule-border: rgba(255, 255, 255, 0.55);
+  --glass-capsule-shadow: 0 4px 20px rgba(18, 31, 23, 0.06);
+  --glass-ui-surface: rgba(248, 246, 240, 0.78);
+  --glass-ui-border: rgba(255, 255, 255, 0.6);
+  --glass-dark-surface: rgba(18, 31, 23, 0.72);
+  --glass-dark-border: rgba(255, 255, 255, 0.15);
+  --glass-blur-sm: 8px;
+  --glass-blur-md: 16px;
+  --glass-blur-lg: 24px;
+
+  /* Subtle Muted Sage Green */
+  --color-sage-accent: #637768;
+  --color-sage-soft: #849688;
+  --color-sage-bg: #EDF2EE;
+  --color-sage-border: rgba(99, 119, 104, 0.22);
+  --color-sage-light: rgba(99, 119, 104, 0.08);
+
+  /* Restrained Exception Crimson */
+  --color-exception-red: #B53A3A;
+  --color-exception-bg: #FDF4F4;
+  --color-exception-border: rgba(181, 58, 58, 0.25);
+  --color-exception-text: #962828;
+
+  /* Cleared Green */
+  --color-cleared-green: #2B6E47;
+  --color-cleared-bg: #EFF7F2;
+  --color-cleared-border: rgba(43, 110, 71, 0.2);
+
+  /* Typography Colors */
+  --text-editorial-main: #131A15;
+  --text-editorial-headline: #111A14;
+  --text-editorial-body: #47544C;
+  --text-editorial-muted: #738077;
+  --text-editorial-light: #9AA69E;
+  --text-editorial-white: #FAF8F5;
+  --text-editorial-white-muted: rgba(250, 248, 245, 0.78);
 
   /* Borders & Dividers */
-  --border-subtle: #EBE5D6;
-  --border-medium: #DDD6C5;
-  --border-focus: #1D3B8F;
-  --border-card: #E8E2D4;
-
-  /* Typography */
-  --text-primary: #0E1726;
-  --text-heading: #0F1A3E;
-  --text-secondary: #5A6A85;
-  --text-muted: #8E877A;
-  --text-light: #A59E92;
-  --text-accent: #1D3B8F;
-
-  /* Financial Semantics - Subtle & Controlled */
-  --color-positive: #15803D;
-  --color-positive-bg: rgba(21, 128, 61, 0.08);
-  --color-positive-border: rgba(21, 128, 61, 0.2);
-
-  --color-negative: #DC2626;
-  --color-negative-bg: rgba(220, 38, 38, 0.08);
-  --color-negative-border: rgba(220, 38, 38, 0.2);
-
-  --color-warning: #D97706;
-  --color-warning-bg: rgba(217, 119, 6, 0.08);
-  --color-warning-border: rgba(217, 119, 6, 0.2);
-
-  --color-info: #1D3B8F;
-  --color-info-bg: rgba(29, 59, 143, 0.08);
-  --color-info-border: rgba(29, 59, 143, 0.2);
-
-  /* Deep AI Navy */
-  --bg-ai-dark: #0A1229;
-  --bg-ai-navy: #0F1A3E;
-  --bg-ai-card: #142247;
-  --border-ai-glow: rgba(59, 130, 246, 0.3);
-
-  /* Geometry & Shadows */
-  --sidebar-width: 250px;
-  --topbar-height: 72px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-
-  --shadow-sm: 0 1px 2px rgba(15, 26, 62, 0.04);
-  --shadow-card: 0 1px 3px rgba(15, 26, 62, 0.04), 0 4px 12px rgba(15, 26, 62, 0.03);
-  --shadow-card-hover: 0 6px 20px rgba(15, 26, 62, 0.08);
-  --shadow-elevated: 0 12px 32px rgba(15, 26, 62, 0.12);
+  --border-editorial-hairline: rgba(20, 32, 24, 0.08);
+  --border-editorial-light: #E7E2D5;
+  --border-editorial-medium: #DDD7C9;
+  --border-editorial-dark: rgba(255, 255, 255, 0.12);
 
   /* Fonts */
-  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-serif-display: 'Newsreader', 'Playfair Display', Georgia, serif;
+  --font-sans-body: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono-numbers: 'JetBrains Mono', monospace;
+
+  /* Shadows */
+  --shadow-subtle: 0 1px 3px rgba(18, 31, 23, 0.03), 0 4px 12px rgba(18, 31, 23, 0.02);
+  --shadow-card: 0 4px 20px rgba(18, 31, 23, 0.05), 0 1px 4px rgba(18, 31, 23, 0.02);
+  --shadow-tablet: 0 30px 70px -15px rgba(18, 31, 23, 0.28), 0 12px 25px -8px rgba(18, 31, 23, 0.12);
+  --shadow-floating: 0 20px 40px -10px rgba(18, 31, 23, 0.12);
+
+  /* Geometry */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
 }
 
 * {
@@ -94,12 +89,16 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: var(--bg-app);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
+  background-color: var(--bg-editorial-ivory);
+  color: var(--text-editorial-main);
+  font-family: var(--font-sans-body);
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -124,23 +123,24 @@ input, select, textarea {
 .tabular-nums {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
+  font-family: var(--font-mono-numbers);
 }
 
-/* Custom Clean Scrollbar */
+/* Custom Editorial Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-app);
+  background: var(--bg-editorial-ivory);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
+  background: var(--border-editorial-medium);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--color-sage-accent);
 }

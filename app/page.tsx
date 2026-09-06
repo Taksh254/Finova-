@@ -1,29 +1,41 @@
 import React from "react";
-import { LandingNavbar } from "@/components/landing/LandingNavbar";
-import { HeroSection } from "@/components/landing/HeroSection";
-import { RetentionStatsBar } from "@/components/landing/RetentionStatsBar";
-import { SmePainVsFinovaSection } from "@/components/landing/SmePainVsFinovaSection";
-import { PillarsSection } from "@/components/landing/PillarsSection";
-import { RoiCalculator } from "@/components/landing/RoiCalculator";
-import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
-import { CtaBanner } from "@/components/landing/CtaBanner";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import styles from "./page.module.css";
+import { EditorialNavbar } from "@/components/landing/EditorialNavbar";
+import { EditorialHero } from "@/components/landing/EditorialHero";
+import { WorkflowSection } from "@/components/landing/WorkflowSection";
+import { GovernanceSection } from "@/components/landing/GovernanceSection";
+import { RealExceptionSection } from "@/components/landing/RealExceptionSection";
+import { PolicyReplaySection } from "@/components/landing/PolicyReplaySection";
+import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
+import { EditorialFooter } from "@/components/landing/EditorialFooter";
 
 export default function LandingPage() {
   return (
-    <div className={styles.landingMain}>
-      <LandingNavbar />
+    <div style={{ backgroundColor: "var(--bg-editorial-ivory)", minHeight: "100vh", position: "relative" }}>
+      {/* 1. FLOATING APPLE LIQUID GLASS NAVBAR */}
+      <EditorialNavbar />
+
       <main>
-        <HeroSection />
-        <RetentionStatsBar />
-        <SmePainVsFinovaSection />
-        <PillarsSection />
-        <RoiCalculator />
-        <TestimonialsSection />
-        <CtaBanner />
+        {/* 01 — HERO & HERO PRODUCT INTERFACE */}
+        <EditorialHero />
+
+        {/* 02 — WHAT FINOVA DOES (5 CONNECTED GLASS STAGES) */}
+        <WorkflowSection />
+
+        {/* 03 — FINOVA CONTROL LOOP (DARK FOREST-GREEN ENVIRONMENT + WORKFLOW PILLS) */}
+        <GovernanceSection />
+
+        {/* 04 — REAL EXAMPLE (UNMATCHED EXCEPTION + BOUNDED POLICY CARDS) */}
+        <RealExceptionSection />
+
+        {/* 05 — SAFE AUTOMATION / POLICY REPLAY */}
+        <PolicyReplaySection />
+
+        {/* 06 — FINAL CTA (CINEMATIC TERRACE & LAKE PANORAMA) */}
+        <FinalCtaSection />
       </main>
-      <LandingFooter />
+
+      {/* 07 — FOOTER (MINIMALIST 1-ROW EDITORIAL FOOTER) */}
+      <EditorialFooter />
     </div>
   );
 }

@@ -1,0 +1,81 @@
+.footerRoot {
+  background-color: var(--bg-editorial-ivory);
+  border-top: 1px solid var(--border-editorial-light);
+  padding: 2.25rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.footerContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Left: Hexagon + FINOVA */
+.brandLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+.brandText {
+  font-family: var(--font-sans-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--color-forest-deep);
+  text-transform: uppercase;
+}
+
+/* Center-left: Copyright */
+.copyright {
+  font-family: var(--font-sans-body);
+  font-size: 0.78rem;
+  color: var(--text-editorial-muted);
+}
+
+/* Center-right: Links */
+.linksGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.linkItem {
+  font-family: var(--font-sans-body);
+  font-size: 0.78rem;
+  color: var(--text-editorial-body);
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+
+.linkItem:hover {
+  color: var(--color-forest-deep);
+}
+
+/* Right: Poetic Tagline */
+.taglineRight {
+  font-family: var(--font-serif-display), 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--color-forest-text-subtle);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 860px) {
+  .footerContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+}

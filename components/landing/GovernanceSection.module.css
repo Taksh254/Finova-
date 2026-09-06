@@ -1,0 +1,215 @@
+.controlLoopSection {
+  position: relative;
+  background: #112016;
+  color: #ffffff;
+  padding: 6.5rem 2.5rem 7.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Subtle landscape / mist visible in background */
+.backdropTexture {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.backdropImage {
+  object-fit: cover;
+  object-position: center 50%;
+  opacity: 0.38;
+  filter: brightness(0.7) contrast(1.1);
+}
+
+.backdropGradient {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(180deg, rgba(14, 28, 20, 0.72) 0%, rgba(14, 28, 20, 0.62) 50%, rgba(14, 28, 20, 0.78) 100%),
+    radial-gradient(circle at 50% 50%, rgba(20, 42, 30, 0.2) 0%, rgba(14, 28, 20, 0.85) 90%);
+}
+
+.sectionContainer {
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.95fr 1.85fr 0.65fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+/* ================= LEFT COLUMN ================= */
+.leftCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  font-family: var(--font-sans-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #849688;
+  margin-bottom: 1.25rem;
+}
+
+.headline {
+  font-family: var(--font-serif-display), 'Newsreader', Georgia, serif;
+  font-size: clamp(2.6rem, 3.8vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 1.25rem 0;
+}
+
+.italicHeadline {
+  font-style: italic;
+  color: #86efac;
+}
+
+.subtitle {
+  font-family: var(--font-sans-body);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 2rem 0;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.65rem 1.4rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans-body);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  width: fit-content;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ================= CENTER: 3 ROWS OF WORKFLOW PILLS ================= */
+.centerWorkflow {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.workflowRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: nowrap;
+}
+
+.workflowNode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  padding: 0.5rem 0.95rem;
+  font-family: var(--font-sans-body);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #ffffff;
+  box-shadow: 
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.25),
+    0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.workflowNode:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.nodeIcon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.arrowRight {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  user-select: none;
+}
+
+/* ================= RIGHT COLUMN: 3 METRICS ================= */
+.rightMetrics {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 2.5rem;
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.metricBig {
+  font-family: var(--font-serif-display), 'Newsreader', Georgia, serif;
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+}
+
+.metricLabel {
+  font-family: var(--font-sans-body);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.4;
+}
+
+@media (max-width: 1100px) {
+  .sectionContainer {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .rightMetrics {
+    flex-direction: row;
+    justify-content: space-between;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-left: 0;
+    padding-top: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .controlLoopSection {
+    padding: 4.5rem 1.25rem 5rem;
+  }
+
+  .rightMetrics {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}

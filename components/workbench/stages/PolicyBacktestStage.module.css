@@ -1,0 +1,297 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stageHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stageEyebrow {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-forest-medium);
+  margin-bottom: 6px;
+}
+
+.stageTitle {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--color-charcoal-primary);
+  margin: 0 0 6px 0;
+  line-height: 1.2;
+}
+
+.stageSubtitle {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: var(--text-editorial-muted);
+  margin: 0;
+}
+
+/* Metric Cards — LEVEL 3 GLASS SURFACES */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.metricCard {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 24px -4px rgba(18, 31, 23, 0.06);
+  transition: all 0.2s ease;
+}
+
+.metricCard:hover {
+  background: rgba(255, 255, 255, 0.78);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    0 12px 30px -4px rgba(18, 31, 23, 0.1);
+}
+
+.metricNumber {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.matchedNum {
+  color: var(--color-cleared-green);
+}
+
+.blockedNum {
+  color: #c26a1b;
+}
+
+.zeroNum {
+  color: var(--color-forest-dark);
+}
+
+.metricTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-charcoal-primary);
+}
+
+.metricDesc {
+  font-size: 12px;
+  color: var(--text-editorial-muted);
+  line-height: 1.4;
+}
+
+/* Table Card — LEVEL 3 GLASS PANEL */
+.tableCard {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 12px 36px -6px rgba(18, 31, 23, 0.08);
+}
+
+.tableHeader {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(16px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tableTitle {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-charcoal-primary);
+  margin: 0;
+}
+
+.periodBadge {
+  font-size: 12px;
+  color: var(--text-editorial-muted);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.backtestTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.backtestTable th {
+  text-align: left;
+  padding: 11px 24px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-editorial-muted);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(246, 244, 239, 0.55);
+  backdrop-filter: blur(12px);
+}
+
+.backtestTable td {
+  padding: 13px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--color-charcoal-primary);
+}
+
+.matchedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(30, 94, 63, 0.1);
+  border: 1px solid rgba(30, 94, 63, 0.18);
+  color: var(--color-cleared-green);
+  font-size: 11.5px;
+  font-weight: 600;
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.8);
+}
+
+.blockedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(194, 106, 27, 0.12);
+  border: 1px solid rgba(194, 106, 27, 0.22);
+  color: #a7540d;
+  font-size: 11.5px;
+  font-weight: 600;
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.8);
+}
+
+.monoCell {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.noteCell {
+  font-size: 12.5px;
+  color: var(--text-editorial-muted);
+}
+
+/* Callout Summary — Tinted Glass */
+.summaryBanner {
+  background: rgba(238, 247, 241, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(30, 94, 63, 0.25);
+  border-radius: 18px;
+  padding: 16px 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 16px rgba(30, 94, 63, 0.06);
+}
+
+.summaryIcon {
+  color: var(--color-cleared-green);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.summaryText {
+  font-size: 13px;
+  color: var(--color-forest-dark);
+  line-height: 1.5;
+}
+
+/* Action Bar */
+.actionBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 20px;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 24px -4px rgba(18, 31, 23, 0.06);
+}
+
+/* Apple-style Physical Glass Button */
+.activateBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, rgba(28, 52, 38, 0.95) 0%, rgba(16, 28, 20, 0.98) 100%);
+  color: #ffffff;
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.38),
+    0 6px 18px rgba(18, 31, 23, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.activateBtn:hover {
+  background: linear-gradient(180deg, rgba(38, 70, 50, 0.98) 0%, rgba(22, 38, 28, 1) 100%);
+  transform: translateY(-1.5px);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.55),
+    0 8px 24px rgba(18, 31, 23, 0.32);
+}
+
+.activateBtn:active {
+  transform: scale(0.985);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}

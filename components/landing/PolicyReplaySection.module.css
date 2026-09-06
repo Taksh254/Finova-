@@ -1,0 +1,776 @@
+.sectionRoot {
+  background-color: var(--bg-editorial-ivory, #FAF8F4);
+  padding: 6.5rem 2rem 7.5rem;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 5;
+}
+
+/* ================= 1. SECTION HEADER ================= */
+.header {
+  text-align: center;
+  max-width: 780px;
+  margin-bottom: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.eyebrow {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #556c5c;
+  margin-bottom: 0.95rem;
+  display: block;
+}
+
+.headline {
+  font-family: var(--font-serif-display), 'Newsreader', Georgia, serif;
+  font-size: clamp(2.3rem, 3.8vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.024em;
+  color: var(--color-forest-deep, #121F17);
+  margin: 0 0 1.25rem 0;
+  text-transform: uppercase;
+}
+
+.headlineAccent {
+  font-style: italic;
+  font-weight: 400;
+  color: #1a402d;
+  letter-spacing: -0.01em;
+}
+
+.supportingCopy {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: #435248;
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ================= 2. SPATIAL REPLAY CANVAS ================= */
+.replayCanvas {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-bottom: 4.5rem;
+}
+
+/* ================= TOP: ACTIVE POLICY CAPSULE ================= */
+.policyCapsuleWrapper {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+  position: relative;
+  z-index: 10;
+}
+
+.policyCapsule {
+  width: 100%;
+  background: linear-gradient(
+    140deg, 
+    rgba(18, 36, 26, 0.94) 0%, 
+    rgba(12, 24, 17, 0.98) 60%, 
+    rgba(8, 18, 13, 1) 100%
+  );
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-top: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 20px;
+  padding: 1.2rem 1.65rem;
+  box-shadow: 
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.4),
+    0 24px 60px -15px rgba(10, 24, 16, 0.5),
+    0 8px 24px -6px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+}
+
+.policyTopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.policyStatusRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.liveGreenDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399, 0 0 20px rgba(52, 211, 153, 0.6);
+  animation: pulseDot 2.2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.88); }
+}
+
+.policyStatusLabel {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #a7f3d0;
+  text-transform: uppercase;
+}
+
+.policyIdTag {
+  font-family: var(--font-mono-numbers), monospace;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.06em;
+}
+
+.policyMainRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.vendorBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vendorIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a7f3d0;
+}
+
+.vendorTitle {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.vendorConstraint {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  color: #a7f3d0;
+  margin-top: 1px;
+}
+
+.policyParameters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.55rem 1.15rem;
+}
+
+.paramItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.paramLabel {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.paramVal {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.paramDivider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.systemStatePill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  border-radius: 9999px;
+  padding: 0.28rem 0.85rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #a7f3d0;
+  letter-spacing: 0.08em;
+}
+
+/* ================= CENTRAL: TIMELINE CONNECTOR RIBBON ================= */
+.timelineRibbon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 9999px;
+  padding: 0.5rem 1.6rem;
+  box-shadow: 
+    inset 0 1px 1px 0 #ffffff,
+    0 8px 24px rgba(18, 32, 22, 0.06);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 5;
+}
+
+.timelineNode {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tlMonth {
+  font-family: var(--font-mono-numbers), monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-forest-deep, #121F17);
+  letter-spacing: 0.06em;
+}
+
+.tlEvent {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  color: #617367;
+}
+
+.tlNodeActive {
+  background: var(--color-forest-deep, #121F17);
+  color: #ffffff;
+  padding: 0.25rem 0.85rem;
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(18, 31, 23, 0.2);
+}
+
+.tlNodeActive .tlMonth {
+  color: #ffffff;
+}
+
+.tlNodeActive .tlEvent {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.zapIcon {
+  color: #a7f3d0;
+}
+
+.timelineArrow {
+  color: #9cb0a3;
+  display: flex;
+  align-items: center;
+}
+
+/* ================= ROUTING TREE PIPELINE ================= */
+.routingTree {
+  width: 100%;
+  max-width: 900px;
+  height: 28px;
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.routingStem {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(180deg, rgba(20, 36, 26, 0.25), rgba(20, 36, 26, 0.15));
+  transform: translateX(-50%);
+}
+
+.routingBranches {
+  position: absolute;
+  top: 8px;
+  left: 17%;
+  right: 17%;
+  height: 20px;
+  border-top: 2px dashed rgba(20, 36, 26, 0.18);
+  border-left: 2px dashed rgba(20, 36, 26, 0.18);
+  border-right: 2px dashed rgba(20, 36, 26, 0.18);
+  border-radius: 12px 12px 0 0;
+}
+
+/* ================= 3 INBOUND TRANSACTIONS GRID ================= */
+.transactionsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1060px;
+  margin-bottom: 2.75rem;
+  position: relative;
+  z-index: 5;
+}
+
+/* Base Transaction Glass Object */
+.txObject {
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 20px;
+  padding: 1.5rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    inset 0 1px 1.5px 0 #ffffff,
+    0 16px 36px -8px rgba(18, 32, 22, 0.07);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  position: relative;
+}
+
+.txObject:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    inset 0 1px 1.5px 0 #ffffff,
+    0 24px 48px -10px rgba(18, 32, 22, 0.12);
+}
+
+/* Transaction 01: Auto-Cleared Success */
+.txSuccess {
+  border-top: 3px solid #16a34a;
+  box-shadow: 
+    inset 0 1px 1.5px 0 #ffffff,
+    0 16px 36px -8px rgba(34, 197, 94, 0.1);
+}
+
+/* Transaction 02 & 03: Blocked */
+.txBlocked {
+  border-top: 3px solid #ef4444;
+  box-shadow: 
+    inset 0 1px 1.5px 0 #ffffff,
+    0 16px 36px -8px rgba(239, 68, 68, 0.1);
+}
+
+.txHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.95rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(20, 36, 26, 0.07);
+}
+
+.txBatchId {
+  font-family: var(--font-mono-numbers), monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-forest-deep, #121F17);
+  letter-spacing: 0.06em;
+}
+
+.txPeriod {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #708276;
+}
+
+.txVendorRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.15rem;
+}
+
+.txVendorName {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-forest-deep, #121F17);
+}
+
+.txAmountValid {
+  font-family: var(--font-mono-numbers), monospace;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-forest-deep, #121F17);
+}
+
+.txAmountExceeded {
+  font-family: var(--font-mono-numbers), monospace;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #b91c1c;
+}
+
+.criteriaPills {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background: rgba(240, 237, 230, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.criteriaCheck {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #2b3b30;
+}
+
+.criteriaFail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+.iconGreen {
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.iconRed {
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.pipelineTransition {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.arrowIcon {
+  color: #728579;
+}
+
+.policyMatchText {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #16a34a;
+}
+
+.policyCheckText {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b91c1c;
+}
+
+/* Outcome Badges */
+.outcomeBadgeSuccess {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: rgba(34, 197, 94, 0.16);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  color: #15803d;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.55rem;
+}
+
+.outcomeDetailSuccess {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  color: #2e5939;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.outcomeBadgeBlocked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  color: #b91c1c;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.55rem;
+}
+
+.outcomeDetailBlocked {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  color: #991b1b;
+  text-align: center;
+  line-height: 1.35;
+}
+
+/* ================= 3. BOUNDED PROOF BAR ================= */
+.boundedProofBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 960px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 14px;
+  padding: 0.85rem 1.6rem;
+  box-shadow: 
+    inset 0 1px 1px 0 #ffffff,
+    0 10px 28px -6px rgba(18, 31, 23, 0.06);
+  box-sizing: border-box;
+}
+
+.proofLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.proofStep {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-forest-deep, #121F17);
+  text-transform: uppercase;
+}
+
+.proofArrow {
+  color: #8fa194;
+  font-weight: 700;
+}
+
+.proofDivider {
+  width: 1px;
+  height: 24px;
+  background: rgba(20, 36, 26, 0.12);
+}
+
+.proofRight {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.proofCapabilityGreen {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #15803d;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.proofCapabilityRed {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #b91c1c;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ================= 4. BEFORE / AFTER CONTRAST ================= */
+.contrastGrid {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 960px;
+  background: rgba(240, 237, 230, 0.45);
+  border: 1px solid rgba(20, 36, 26, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 4rem;
+  box-sizing: border-box;
+}
+
+.contrastColBefore {
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.contrastColAfter {
+  flex: 1;
+  padding-left: 2rem;
+}
+
+.contrastTag {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #728277;
+  display: block;
+  margin-bottom: 0.85rem;
+}
+
+.contrastTagActive {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #15803d;
+  display: block;
+  margin-bottom: 0.85rem;
+}
+
+.contrastPoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #3f5145;
+}
+
+.contrastDivider {
+  width: 1px;
+  background: rgba(20, 36, 26, 0.1);
+}
+
+/* ================= 5. FOOTER EDITORIAL STATEMENT ================= */
+.footerEditorial {
+  text-align: center;
+  max-width: 780px;
+  margin-top: 0.5rem;
+}
+
+.statementSerif {
+  font-family: var(--font-serif-display), 'Newsreader', Georgia, serif;
+  font-size: clamp(1.7rem, 2.7vw, 2.3rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.25;
+  color: var(--color-forest-deep, #121F17);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .policyMainRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .policyParameters {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .transactionsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .routingTree {
+    display: none;
+  }
+
+  .boundedProofBar {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .proofDivider {
+    display: none;
+  }
+
+  .contrastGrid {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .contrastColBefore {
+    padding-right: 0;
+  }
+
+  .contrastColAfter {
+    padding-left: 0;
+  }
+
+  .contrastDivider {
+    height: 1px;
+    width: 100%;
+  }
+}

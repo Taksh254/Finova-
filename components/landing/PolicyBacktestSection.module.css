@@ -1,0 +1,452 @@
+.policySectionRoot {
+  position: relative;
+  background: var(--bg-editorial-ivory);
+  padding: 7.5rem 2rem 8.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Cinematic subtle green/ivory transition gradient */
+.transitionGlow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 240px;
+  background: linear-gradient(180deg, rgba(18, 33, 23, 0.08) 0%, rgba(250, 248, 244, 0) 100%);
+  pointer-events: none;
+}
+
+.policyContainer {
+  position: relative;
+  z-index: 10;
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  max-width: 760px;
+  margin-bottom: 4rem;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-sage-accent);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.headline {
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 4vw, 3.8rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--color-forest-dark);
+  margin: 0 0 1.25rem 0;
+}
+
+.italicHeadline {
+  font-style: italic;
+  color: var(--color-forest-rich);
+}
+
+.supportingText {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-editorial-muted);
+  margin: 0;
+}
+
+/* Two-Column Grid: Policy Proposal Card on Left, Backtest Results on Right */
+.policyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ================= SECTION 9: LARGE TRANSLUCENT GLASS POLICY CARD ================= */
+.policyGlassCard {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 28px;
+  padding: 2.75rem 2.5rem;
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 #ffffff,
+    0 24px 56px -12px rgba(18, 31, 23, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.policyCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.75rem;
+}
+
+.policyCardTag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-sage-accent);
+}
+
+.statusProposedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(217, 119, 6, 0.12);
+  border: 1px solid rgba(217, 119, 6, 0.28);
+  color: #b45309;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.06em;
+}
+
+.policyCardTitle {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--color-forest-dark);
+  margin: 0 0 0.4rem 0;
+}
+
+.policyCardLimit {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-forest-rich);
+  margin-bottom: 1.75rem;
+}
+
+/* Policy Attributes List */
+.policyMetaList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: rgba(245, 242, 235, 0.6);
+  backdrop-filter: blur(16px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.policyMetaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metaKey {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-editorial-muted);
+}
+
+.metaVal {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-forest-dark);
+}
+
+/* Subtle Amber Glass Warning Pill */
+.amberWarningPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(254, 243, 199, 0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 2rem;
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.8);
+}
+
+/* Policy Action Buttons */
+.policyButtonsRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.backtestBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  color: var(--color-forest-dark);
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0.5px #ffffff, 0 4px 12px rgba(18, 31, 23, 0.04);
+  transition: all 0.2s ease;
+}
+
+.backtestBtn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.activateBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(180deg, rgba(28, 52, 38, 0.95) 0%, rgba(16, 28, 20, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 6px 18px rgba(18, 31, 23, 0.25);
+  transition: all 0.2s ease;
+}
+
+.activateBtn:hover {
+  background: linear-gradient(180deg, rgba(38, 70, 50, 0.98) 0%, rgba(22, 38, 28, 1) 100%);
+  transform: translateY(-1px);
+}
+
+/* ================= SECTION 10: BACKTEST RESULTS GLASS ================= */
+.backtestCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 3 Floating Glass Summary Cards */
+.backtestStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.statGlassCard {
+  border-radius: 20px;
+  padding: 1.35rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    inset 0 1px 1px #ffffff,
+    0 8px 24px -4px rgba(18, 31, 23, 0.05);
+  transition: all 0.22s ease;
+}
+
+.statGlassCard:hover {
+  transform: translateY(-2px);
+}
+
+.statCardValid {
+  background: rgba(236, 253, 245, 0.8);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.statCardBlocked {
+  background: rgba(254, 242, 242, 0.8);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.statCardZero {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.statNumber {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+
+.statCardValid .statNumber {
+  color: #065f46;
+}
+
+.statCardBlocked .statNumber {
+  color: #991b1b;
+}
+
+.statCardZero .statNumber {
+  color: var(--color-forest-dark);
+}
+
+.statTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-forest-dark);
+}
+
+.statDesc {
+  font-size: 0.7rem;
+  color: var(--text-editorial-muted);
+}
+
+/* Translucent Glass Table for Historical Transactions */
+.historicalGlassTable {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(32px) saturate(170%);
+  -webkit-backdrop-filter: blur(32px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 
+    inset 0 1px 1px #ffffff,
+    0 16px 40px -8px rgba(18, 31, 23, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-editorial-muted);
+}
+
+/* Floating Glass Transaction Rows */
+.histRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  font-size: 0.8rem;
+  transition: all 0.18s ease;
+}
+
+.histRow:hover {
+  transform: translateX(2px);
+}
+
+.histRowValid {
+  background: rgba(240, 253, 244, 0.75);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #064e3b;
+}
+
+.histRowBlocked {
+  background: rgba(254, 242, 242, 0.8);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #7f1d1d;
+}
+
+.rowLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rowDate {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.rowVendor {
+  font-weight: 600;
+}
+
+.rowRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rowAmount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.badgePassed {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #047857;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.badgeBlocked {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+@media (max-width: 1024px) {
+  .policyGrid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .policySectionRoot {
+    padding: 4.5rem 1.25rem 5.5rem;
+  }
+
+  .backtestStatsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .policyButtonsRow {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,792 @@
+.heroRoot {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 5.5rem;
+  padding-bottom: 4rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--bg-editorial-ivory, #FAF8F4);
+}
+
+/* ================= 1. ARCHITECTURAL VILLA & MISTY LAKE ATMOSPHERE ================= */
+.atmosphereBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.atmosphereImage {
+  object-fit: cover;
+  object-position: center 36%;
+  opacity: 0.92;
+  filter: saturate(0.95) contrast(1.02);
+  transform: scale(1.02);
+}
+
+/* Soft warm ivory / mist vignette ensuring the typography and floating glass pop crisply */
+.atmosphereOverlay {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 85% 65% at 50% 35%, rgba(250, 248, 244, 0.72) 0%, rgba(250, 248, 244, 0.45) 50%, rgba(250, 248, 244, 0.2) 80%, rgba(250, 248, 244, 0.1) 100%),
+    linear-gradient(180deg, rgba(250, 248, 244, 0.85) 0%, rgba(250, 248, 244, 0.15) 30%, rgba(250, 248, 244, 0.1) 70%, rgba(250, 248, 244, 0.85) 100%);
+}
+
+/* ================= 2. RIGHT-SIDE EDITORIAL LOCKUP (AS IN REFERENCE) ================= */
+.sideEditorial {
+  position: absolute;
+  right: 3.2rem;
+  top: 36%;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  pointer-events: none;
+}
+
+.sideEditorialLine {
+  width: 1px;
+  height: 120px;
+  background: rgba(20, 36, 26, 0.22);
+}
+
+.sideEditorialText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(20, 36, 26, 0.62);
+  line-height: 1.35;
+}
+
+.sideEditorialSpacer {
+  height: 0.85rem;
+}
+
+.heroContainer {
+  position: relative;
+  z-index: 10;
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* ================= 3. HEADLINE & SUPPORTING COPY ================= */
+.headerBlock {
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto 1.4rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.headline {
+  font-family: var(--font-serif-display), 'Newsreader', Georgia, serif;
+  font-size: clamp(2.2rem, 3.9vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.026em;
+  color: var(--color-forest-deep, #121F17);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.headlineAccent {
+  font-style: italic;
+  font-weight: 400;
+  color: #1a402d;
+  letter-spacing: -0.01em;
+}
+
+.supportingCopy {
+  font-family: var(--font-sans-body), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(0.92rem, 1.15vw, 1.02rem);
+  line-height: 1.5;
+  color: #3b4c41;
+  max-width: 610px;
+  margin: 0.75rem auto 0 auto;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* ================= 4. FLOATING FINOVA LIQUID GLASS WORKSPACE ================= */
+.workspaceWrapper {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/* The physically suspended visionOS-style spatial Liquid Glass Chassis */
+.spatialGlassChassis {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(
+    140deg, 
+    rgba(20, 38, 28, 0.74) 0%, 
+    rgba(14, 28, 20, 0.82) 55%, 
+    rgba(10, 20, 15, 0.9) 100%
+  );
+  backdrop-filter: blur(48px) saturate(210%) brightness(1.04);
+  -webkit-backdrop-filter: blur(48px) saturate(210%) brightness(1.04);
+  border-radius: 24px;
+  border: 1.5px solid rgba(255, 255, 255, 0.38);
+  border-top: 2px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1.5px 1.5px 0 rgba(0, 0, 0, 0.5),
+    inset 0 0 35px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 32px 75px -14px rgba(8, 22, 15, 0.5),
+    0 12px 28px -5px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.spatialGlassChassis:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1.5px 1.5px 0 rgba(0, 0, 0, 0.5),
+    inset 0 0 40px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.24),
+    0 40px 90px -15px rgba(8, 22, 15, 0.56),
+    0 16px 36px -5px rgba(0, 0, 0, 0.35);
+}
+
+/* Outer Specular Beveled Glass Edge Ring */
+.glassRimHighlight {
+  position: absolute;
+  inset: -1px;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Diagonal Specular Reflection Sweep Across Glass Face */
+.spatialGlassChassis::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Floor Reflection on Terrace Below Floating Window */
+.floorReflection {
+  position: absolute;
+  bottom: -32px;
+  left: 8%;
+  right: 8%;
+  height: 48px;
+  background: radial-gradient(ellipse at center, rgba(16, 36, 25, 0.32) 0%, rgba(16, 36, 25, 0.08) 55%, transparent 75%);
+  filter: blur(14px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ================= WINDOW HEADER BAR ================= */
+.windowHeaderBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(16px);
+  position: relative;
+  z-index: 3;
+}
+
+.windowControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dotsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.controlDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.9;
+}
+
+.dotClose {
+  background: #ff5f56;
+  box-shadow: 0 0 5px rgba(255, 95, 86, 0.4);
+}
+
+.dotMin {
+  background: #ffbd2e;
+  box-shadow: 0 0 5px rgba(255, 189, 46, 0.4);
+}
+
+.dotMax {
+  background: #27c93f;
+  box-shadow: 0 0 5px rgba(39, 201, 63, 0.4);
+}
+
+.brandTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.92);
+  text-transform: uppercase;
+}
+
+/* Segmented Glass Mode Switcher */
+.glassSegmentSwitcher {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.segmentTab {
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.71rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 0.24rem 0.85rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.segmentTab:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.segmentActive {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Window Action Buttons (Search & More) */
+.windowActions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.glassIconBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.glassIconBtn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ================= WINDOW BODY: SPLIT TWO-PANE ARCHITECTURE ================= */
+.windowBody {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 1.15rem;
+  padding: 1.05rem 1.25rem;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
+
+/* ================= LEFT PANE: LEDGER FEED ================= */
+.ledgerPane {
+  display: flex;
+  flex-direction: column;
+}
+
+.paneHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+  padding: 0 0.25rem;
+}
+
+.paneLabel {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.transactionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+/* Standard Translucent Row */
+.txRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.52rem 0.8rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+}
+
+.txLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.txFileIcon {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.skeletonBar {
+  height: 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.txRight {
+  display: flex;
+  align-items: center;
+}
+
+.badgeMatchedSkeleton {
+  width: 48px;
+  height: 14px;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.22);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+/* ACTIVE INVESTIGATED EXCEPTION ROW (HERO FOCUS ITEM) */
+.txRowActiveException {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.18) 0%, rgba(220, 38, 38, 0.09) 100%);
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    0 4px 18px -2px rgba(239, 68, 68, 0.3);
+  position: relative;
+}
+
+.txFileIconActive {
+  color: #f87171;
+}
+
+.skeletonBarActive {
+  height: 10px;
+  border-radius: 9999px;
+  background: rgba(248, 113, 113, 0.4);
+}
+
+.badgeExceptionSkeleton {
+  width: 44px;
+  height: 14px;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(248, 113, 113, 0.55);
+}
+
+/* ================= RIGHT PANE: SUSPENDED SPATIAL GLASS INSPECTOR ================= */
+.inspectorGlassPane {
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.25),
+    0 14px 32px -6px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Inspector Header */
+.inspectorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.inspectorTitleBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sparkleIcon {
+  color: #a7f3d0;
+}
+
+.inspectorTitle {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.safetyShieldPill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  border-radius: 9999px;
+  padding: 0.18rem 0.55rem;
+}
+
+.shieldIcon {
+  color: #34d399;
+}
+
+.safetyBar {
+  width: 42px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(52, 211, 153, 0.45);
+}
+
+.subtleHeaderBar {
+  width: 60px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  margin-bottom: 0.75rem;
+}
+
+/* Verified Evidence Rows */
+.evidenceSection {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.evidenceItem {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.checkIcon {
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+.evidenceBar {
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Proposed Balanced Journal Entry Box */
+.journalEntryBox {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 0.95rem;
+}
+
+.journalLineDr {
+  display: flex;
+  align-items: center;
+}
+
+.drBar {
+  height: 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.journalLineCr {
+  display: flex;
+  align-items: center;
+  padding-left: 0.55rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.crBar {
+  height: 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Liquid Glass Approve Button */
+.approveGlassBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.13) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  border-radius: 10px;
+  padding: 0.55rem 1.1rem;
+  color: #ffffff;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.79rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    0 5px 16px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.approveGlassBtn:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.18) 100%);
+  border-color: rgba(255, 255, 255, 0.68);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    0 7px 20px rgba(0, 0, 0, 0.28);
+}
+
+/* ================= INVESTIGATION & AUDIT TAB STYLES ================= */
+.investigationDetailsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.investigationItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+}
+
+.investigationItemTitle {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.investigationItemDesc {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 1px;
+}
+
+.verifiedTextBadge {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  padding: 0.16rem 0.55rem;
+  border-radius: 9999px;
+}
+
+.tabExplainText {
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.77rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0.5rem 0 1.1rem 0;
+}
+
+/* ================= 5. CTAS ANCHORED BELOW WORKSPACE ================= */
+.ctaRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 10;
+}
+
+.primaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: var(--color-forest-deep, #121F17);
+  color: #ffffff;
+  padding: 0.72rem 1.6rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+    0 8px 22px rgba(18, 31, 23, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primaryCta:hover {
+  background: #1e3327;
+  transform: translateY(-1.5px);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 28px rgba(18, 31, 23, 0.32);
+}
+
+.secondaryCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  padding: 0.5rem 1.25rem 0.5rem 0.6rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-forest-deep, #121F17);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+    0 4px 16px rgba(18, 31, 23, 0.05);
+  transition: all 0.2s ease;
+}
+
+.secondaryCta:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(18, 31, 23, 0.08);
+}
+
+.playIconCircle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--color-forest-deep, #121F17);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 2px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1200px) {
+  .sideEditorial {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .windowBody {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroRoot {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
+
+  .headerBlock {
+    margin-bottom: 1.25rem;
+  }
+
+  .headline {
+    font-size: 2.1rem;
+  }
+
+  .windowHeaderBar {
+    flex-wrap: wrap;
+    padding: 0.6rem 0.85rem;
+  }
+
+  .windowBody {
+    padding: 0.9rem;
+  }
+
+  .ctaRow {
+    margin-top: 1.5rem;
+  }
+}

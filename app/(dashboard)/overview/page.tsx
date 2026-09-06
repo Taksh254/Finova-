@@ -1,14 +1,14 @@
 import React from "react";
-import { getDashboardMetrics, getCashFlowChartData } from "@/lib/finance/metrics";
-import { OverviewDashboardClient } from "@/components/dashboard/OverviewDashboardClient";
+import { WorkbenchShell } from "@/components/workbench/WorkbenchShell";
 
 export const dynamic = "force-dynamic";
 
-export default async function OverviewPage() {
-  const [metrics, cashFlowData] = await Promise.all([
-    getDashboardMetrics(),
-    getCashFlowChartData(),
-  ]);
+export const metadata = {
+  title: "Controller Workbench | FINOVA",
+  description:
+    "AI proposes. Deterministic checks verify. Finance approves. Policies automate within boundaries.",
+};
 
-  return <OverviewDashboardClient metrics={metrics} cashFlowData={cashFlowData} />;
+export default function OverviewPage() {
+  return <WorkbenchShell />;
 }
