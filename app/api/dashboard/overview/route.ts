@@ -1,17 +1,13 @@
-import { NextResponse } from "next/server";
-import { getDashboardMetrics } from "@/lib/finance/metrics";
+import { getDashboardOverview } from "@/lib/dashboard/overview";
+import { ok, handleApiError } from "@/lib/api/http";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const companyId = searchParams.get("companyId") || undefined;
-    const metrics = await getDashboardMetrics(companyId);
-    return NextResponse.json({ success: true, data: metrics });
+    const organizationId = searchParams.get("organizationId") || undefined;
+    const overview = await getDashboardOverview(organizationId);
+    return ok(overview);
   } catch (error) {
-    console.error("Failed to fetch dashboard metrics:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to compute financial metrics" },
-      { status: 500 }
-    );
+    return handleApiError(error, "DASHBOARD_OVERVIEW_FAILED", "Failed to compute dashboard overview");
   }
 }

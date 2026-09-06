@@ -1,15 +1,55 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, AlertCircle, TrendingUp, ShieldAlert, Sparkles } from "lucide-react";
 import styles from "./AICFOCommandCard.module.css";
+
+interface RecommendedAction {
+  id: string;
+  action: string;
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  potentialImpact?: string;
+  routeTo?: string;
+}
+
+interface FinancialBrief {
+  summary: string;
+  recommendedActions: RecommendedAction[];
+}
 
 interface AICFOCommandCardProps {
   onAction?: (actionType: string) => void;
 }
 
+const BADGE_BY_PRIORITY: Record<RecommendedAction["priority"], { className: string; Icon: typeof ShieldAlert }> = {
+  HIGH: { className: styles.redBadge, Icon: ShieldAlert },
+  MEDIUM: { className: styles.amberBadge, Icon: AlertCircle },
+  LOW: { className: styles.emeraldBadge, Icon: TrendingUp },
+};
+
 export function AICFOCommandCard({ onAction }: AICFOCommandCardProps) {
+  const [brief, setBrief] = useState<FinancialBrief | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/ai/brief")
+      .then((res) => res.json())
+      .then((json) => {
+        if (!cancelled && json.success) setBrief(json.data);
+      })
+      .catch((error) => console.error("Failed to load AI CFO brief:", error))
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const actions = brief?.recommendedActions.slice(0, 3) || [];
+
   return (
     <div className={styles.card}>
       {/* Background Orbital Rings Graphic */}
@@ -30,72 +70,42 @@ export function AICFOCommandCard({ onAction }: AICFOCommandCardProps) {
               Monitoring
             </span>
           </div>
-          <p className={styles.attentionCount}>3 things need your attention.</p>
+          <p className={styles.attentionCount}>
+            {loading
+              ? "Analyzing live financial data..."
+              : actions.length > 0
+              ? `${actions.length} thing${actions.length === 1 ? "" : "s"} need${actions.length === 1 ? "s" : ""} your attention.`
+              : "No urgent items right now."}
+          </p>
         </div>
       </div>
 
       {/* Priority Alerts List */}
       <div className={styles.alertList}>
-        {/* Item 01 */}
-        <div className={styles.alertItem}>
-          <div className={`${styles.iconBadge} ${styles.redBadge}`}>
-            <ShieldAlert size={14} />
-          </div>
-          <div className={styles.alertContent}>
-            <div className={styles.alertTitle}>3 invoices are overdue (₹84,500)</div>
-            <div className={styles.alertSubtext}>4 invoices are more than 15 days overdue.</div>
-            <Link
-              href="/invoices"
-              className={styles.actionLink}
-              onClick={() => onAction && onAction("review-invoices")}
-            >
-              <span>Review invoices</span>
-              <ArrowRight size={12} />
-            </Link>
-          </div>
-        </div>
-
-        {/* Item 02 */}
-        <div className={styles.alertItem}>
-          <div className={`${styles.iconBadge} ${styles.amberBadge}`}>
-            <AlertCircle size={14} />
-          </div>
-          <div className={styles.alertContent}>
-            <div className={styles.alertTitle}>Cash flow may tighten in 18 days</div>
-            <div className={styles.alertSubtext}>
-              Marketing expenses increased 18% this month (₹42,000 above average).
+        {actions.map((item) => {
+          const { className, Icon } = BADGE_BY_PRIORITY[item.priority];
+          return (
+            <div className={styles.alertItem} key={item.id}>
+              <div className={`${styles.iconBadge} ${className}`}>
+                <Icon size={14} />
+              </div>
+              <div className={styles.alertContent}>
+                <div className={styles.alertTitle}>{item.action}</div>
+                {item.potentialImpact && <div className={styles.alertSubtext}>{item.potentialImpact}</div>}
+                {item.routeTo && (
+                  <Link
+                    href={item.routeTo}
+                    className={styles.actionLink}
+                    onClick={() => onAction && onAction(item.id)}
+                  >
+                    <span>View</span>
+                    <ArrowRight size={12} />
+                  </Link>
+                )}
+              </div>
             </div>
-            <Link
-              href="/expenses"
-              className={styles.actionLink}
-              onClick={() => onAction && onAction("investigate-expenses")}
-            >
-              <span>Investigate</span>
-              <ArrowRight size={12} />
-            </Link>
-          </div>
-        </div>
-
-        {/* Item 03 */}
-        <div className={styles.alertItem}>
-          <div className={`${styles.iconBadge} ${styles.emeraldBadge}`}>
-            <TrendingUp size={14} />
-          </div>
-          <div className={styles.alertContent}>
-            <div className={styles.alertTitle}>₹27,400 duplicate expense flagged</div>
-            <div className={styles.alertSubtext}>
-              Cash runway improved by 21 days based on current inflows and collections.
-            </div>
-            <Link
-              href="/reconciliation"
-              className={styles.actionLink}
-              onClick={() => onAction && onAction("view-recommendations")}
-            >
-              <span>Review recommendations</span>
-              <ArrowRight size={12} />
-            </Link>
-          </div>
-        </div>
+          );
+        })}
       </div>
 
       {/* Footer Motto */}

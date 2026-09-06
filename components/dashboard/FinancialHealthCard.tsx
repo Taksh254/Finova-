@@ -3,20 +3,39 @@
 import React from "react";
 import styles from "./FinancialHealthCard.module.css";
 
-interface HealthMetric {
-  label: string;
-  value: number;
+export interface HealthScoreData {
+  score: number;
+  components: {
+    liquidity: number;
+    profitability: number;
+    growth: number;
+    expenseControl: number;
+    receivables: number;
+    risk: number;
+  };
 }
 
-const metrics: HealthMetric[] = [
-  { label: "Cash health", value: 92 },
-  { label: "Profitability", value: 91 },
-  { label: "Collections", value: 74 },
-  { label: "Expense control", value: 84 },
-];
+interface FinancialHealthCardProps {
+  healthScore?: HealthScoreData;
+}
 
-export function FinancialHealthCard() {
-  const score = 86;
+function verdictFor(score: number): string {
+  if (score >= 75) return "Healthy";
+  if (score >= 50) return "Fair";
+  return "At Risk";
+}
+
+export function FinancialHealthCard({ healthScore }: FinancialHealthCardProps) {
+  const score = healthScore?.score ?? 0;
+  const c = healthScore?.components;
+
+  const metrics = [
+    { label: "Cash health", value: c?.liquidity ?? 0 },
+    { label: "Profitability", value: c?.profitability ?? 0 },
+    { label: "Collections", value: c?.receivables ?? 0 },
+    { label: "Expense control", value: c?.expenseControl ?? 0 },
+  ];
+
   const circumference = 2 * Math.PI * 34; // r=34
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
@@ -28,13 +47,7 @@ export function FinancialHealthCard() {
         {/* Radial Gauge */}
         <div className={styles.gaugeArea}>
           <svg className={styles.gaugeSvg} viewBox="0 0 84 84">
-            <circle
-              cx="42"
-              cy="42"
-              r="34"
-              className={styles.gaugeBgCircle}
-              strokeWidth="7"
-            />
+            <circle cx="42" cy="42" r="34" className={styles.gaugeBgCircle} strokeWidth="7" />
             <circle
               cx="42"
               cy="42"
@@ -49,7 +62,7 @@ export function FinancialHealthCard() {
           <div className={styles.gaugeTextGroup}>
             <span className={styles.scoreNumber}>{score}</span>
             <span className={styles.scoreMax}>/100</span>
-            <span className={styles.scoreVerdict}>Healthy</span>
+            <span className={styles.scoreVerdict}>{verdictFor(score)}</span>
           </div>
         </div>
 
@@ -62,10 +75,7 @@ export function FinancialHealthCard() {
                 <span className={styles.metricValue}>{m.value}%</span>
               </div>
               <div className={styles.track}>
-                <div
-                  className={styles.fill}
-                  style={{ width: `${m.value}%` }}
-                />
+                <div className={styles.fill} style={{ width: `${m.value}%` }} />
               </div>
             </div>
           ))}

@@ -4,9 +4,9 @@ import { getAIService } from "@/lib/ai";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const companyId = searchParams.get("companyId") || undefined;
+    const organizationId = searchParams.get("organizationId") || undefined;
     const aiService = getAIService();
-    const brief = await aiService.generateFinancialBrief(companyId);
+    const brief = await aiService.generateFinancialBrief(organizationId);
     return NextResponse.json({ success: true, data: brief });
   } catch (error) {
     console.error("Failed to generate AI financial brief:", error);

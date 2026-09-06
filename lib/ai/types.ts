@@ -38,5 +38,5 @@ export interface FinancialBrief {
 }
 
 export interface IAIFinancialService {
-  generateFinancialBrief(companyId?: string): Promise<FinancialBrief>;
+  generateFinancialBrief(organizationId?: string): Promise<FinancialBrief>;
 }

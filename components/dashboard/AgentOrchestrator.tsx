@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Bot,
   CheckCircle2,
   Clock,
   AlertTriangle,
-  Play,
   ArrowRight,
   Sparkles,
   Layers,
@@ -24,69 +24,122 @@ interface AgentNode {
   metrics: string;
 }
 
-const initialAgents: AgentNode[] = [
-  {
-    id: "cfo-agent",
-    name: "CFO Agent",
-    role: "Liquidity & Capital Strategy",
-    status: "running",
-    statusText: "Running",
-    activity: "Simulating 60-day cash buffer against ₹8.6L projected revenue",
-    metrics: "3 risks detected",
-  },
-  {
-    id: "analysis-agent",
-    name: "Analysis Agent",
-    role: "Variance & Spend Intelligence",
-    status: "completed",
-    statusText: "Completed",
-    activity: "Flagged +18% marketing expense acceleration vs 3-mo baseline",
-    metrics: "4 anomalies scanned",
-  },
-  {
-    id: "reconciliation-agent",
-    name: "Reconciliation Agent",
-    role: "Bank & Ledger Matching",
-    status: "waiting",
-    statusText: "Waiting for approval",
-    activity: "82 transactions reconciled; 3 ledger mismatches pending review",
-    metrics: "82 matched / 3 pending",
-  },
-  {
-    id: "invoice-agent",
-    name: "Invoice Agent",
-    role: "Receivables & Vendor Intake",
-    status: "running",
-    statusText: "Running",
-    activity: "Processed 14 client invoices; auto-matched 9 payment receipts",
-    metrics: "14 processed",
-  },
-  {
-    id: "reporting-agent",
-    name: "Reporting Agent",
-    role: "Tax & Financial Statements",
-    status: "completed",
-    statusText: "Completed",
-    activity: "August 2025 provisional P&L and GST summary ledger compiled",
-    metrics: "Audit-ready",
-  },
+interface AgentActivityRecord {
+  id: string;
+  agentName: string;
+  taskType: string;
+  status: string;
+  summary: string;
+  confidenceScore: number | null;
+  mode: string;
+  createdAt: string;
+}
+
+interface ReconciliationMatch {
+  id: string;
+  status: string;
+}
+
+const AGENT_DEFS: Array<{ id: string; agentName: string; name: string; role: string }> = [
+  { id: "cash-agent", agentName: "cash-agent", name: "Cash Agent", role: "Liquidity & Runway" },
+  { id: "expense-agent", agentName: "expense-agent", name: "Expense Agent", role: "Spend Pattern Intelligence" },
+  { id: "revenue-agent", agentName: "revenue-agent", name: "Revenue Agent", role: "Growth & Receivables" },
+  { id: "reconciliation-agent", agentName: "reconciliation-agent", name: "Reconciliation Agent", role: "Bank & Ledger Matching" },
+  { id: "risk-agent", agentName: "risk-agent", name: "Risk Agent", role: "Signal Triage & Severity" },
 ];
+
+function timeAgo(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+function buildAgentNodes(activityByAgent: Map<string, AgentActivityRecord>): AgentNode[] {
+  return AGENT_DEFS.map((def) => {
+    const latest = activityByAgent.get(def.agentName);
+
+    if (!latest) {
+      return {
+        id: def.id,
+        name: def.name,
+        role: def.role,
+        status: "waiting",
+        statusText: "Idle",
+        activity: "Not yet wired to a live workflow in this build.",
+        metrics: "No runs yet",
+      };
+    }
+
+    const status: AgentNode["status"] =
+      latest.status === "NEEDS_APPROVAL" ? "waiting" : latest.status === "FAILED" ? "attention" : "completed";
+    const statusText =
+      latest.status === "NEEDS_APPROVAL" ? "Waiting for approval" : latest.status === "FAILED" ? "Needs attention" : "Completed";
+
+    return {
+      id: def.id,
+      name: def.name,
+      role: def.role,
+      status,
+      statusText,
+      activity: latest.summary,
+      metrics: `${latest.mode === "LLM_SYNTHESIS" ? "LLM" : "Rule engine"} · ${timeAgo(latest.createdAt)}`,
+    };
+  });
+}
 
 interface AgentOrchestratorProps {
   onTriggerSync?: () => void;
   onApproveBatch?: () => void;
 }
 
-export function AgentOrchestrator({ onTriggerSync, onApproveBatch }: AgentOrchestratorProps) {
+export function AgentOrchestrator({ onTriggerSync }: AgentOrchestratorProps) {
   const [isSyncing, setIsSyncing] = useState(false);
-  const [agents, setAgents] = useState(initialAgents);
+  const [agents, setAgents] = useState<AgentNode[]>(buildAgentNodes(new Map()));
+  const [pendingCount, setPendingCount] = useState(0);
 
-  const handleSync = () => {
+  const refresh = useCallback(async () => {
+    try {
+      const [activityRes, matchesRes] = await Promise.all([
+        fetch("/api/orchestrator/activity?limit=50"),
+        fetch("/api/reconciliation/matches"),
+      ]);
+      const activityJson = await activityRes.json();
+      const matchesJson = await matchesRes.json();
+
+      if (activityJson.success) {
+        const byAgent = new Map<string, AgentActivityRecord>();
+        for (const record of activityJson.data as AgentActivityRecord[]) {
+          if (!byAgent.has(record.agentName)) byAgent.set(record.agentName, record);
+        }
+        setAgents(buildAgentNodes(byAgent));
+      }
+
+      if (matchesJson.success) {
+        const pending = (matchesJson.data as ReconciliationMatch[]).filter((m) => m.status === "PROPOSED").length;
+        setPendingCount(pending);
+      }
+    } catch (error) {
+      console.error("Failed to refresh agent orchestrator state:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const handleSync = async () => {
     setIsSyncing(true);
     if (onTriggerSync) onTriggerSync();
-    setTimeout(() => {
+    try {
+      await fetch("/api/agents/run", { method: "POST" });
+      await refresh();
+    } finally {
       setIsSyncing(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -114,19 +167,16 @@ export function AgentOrchestrator({ onTriggerSync, onApproveBatch }: AgentOrches
           <button
             className={`${styles.syncBtn} ${isSyncing ? styles.syncing : ""}`}
             onClick={handleSync}
-            title="Force synchronization across all 5 agents"
+            disabled={isSyncing}
+            title="Run the Reconciliation and Analysis agents now"
           >
             <RefreshCw size={13} className={isSyncing ? styles.spinIcon : ""} />
             <span>{isSyncing ? "Syncing Pipeline..." : "Sync All Agents"}</span>
           </button>
-          <button
-            className={styles.approveBtn}
-            onClick={onApproveBatch}
-            title="Approve pending Reconciliation Agent batch"
-          >
+          <Link href="/reconciliation" className={styles.approveBtn} title="Review pending reconciliation matches">
             <CheckCircle2 size={13} />
-            <span>Approve Batch (3)</span>
-          </button>
+            <span>Review Pending ({pendingCount})</span>
+          </Link>
         </div>
       </div>
 

@@ -1,6 +1,3 @@
-// Finova - Finance Operations Platform
-// Prisma Schema - SQLite for hackathon MVP
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,140 +7,690 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Company {
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  OWNER
+  ADMIN
+  ACCOUNTANT
+  TREASURER
+  HR
+  PAYROLL
+  VIEWER
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum PayrollStatus {
+  DRAFT
+  PROCESSING
+  PROCESSED
+  PAID
+  CANCELLED
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  WORK_FROM_HOME
+  ON_LEAVE
+  HOLIDAY
+}
+
+enum AlertType {
+  LOW_CASH
+  OVERDUE_INVOICE
+  UNUSUAL_EXPENSE
+  PAYMENT_DUE
+  PAYROLL_DUE
+  RECONCILIATION
+  SYSTEM
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AgentType {
+  ORCHESTRATOR
+  ACCOUNTANT
+  TREASURER
+  PAYROLL
+}
+
+enum AgentExecutionStatus {
+  STARTED
+  COMPLETED
+  FAILED
+}
+
+// ============================================================
+// ORGANIZATION
+// ============================================================
+
+model Organization {
   id              String   @id @default(cuid())
   name            String
-  displayName     String
+  displayName     String?
+  email           String?
   currency        String   @default("INR")
-  fiscalYearStart Int      @default(4) // April (Indian FY)
+  fiscalYearStart Int      @default(4)
   industry        String?
+  timezone        String   @default("Asia/Kolkata")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  // Relations
-  users           User[]
-  transactions    Transaction[]
-  invoices        Invoice[]
-  payrollRecords  PayrollRecord[]
-  cashFlowEntries CashFlowEntry[]
-  exceptions      Exception[]
-  documents       Document[]
+  users                 User[]
+  accounts              Account[]
+  transactions          Transaction[]
+  invoices              Invoice[]
+  customers             Customer[]
+  payments              Payment[]
+  employees             Employee[]
+  payrollRuns           PayrollRun[]
+  payrollRecords        PayrollRecord[]
+  payslips              Payslip[]
+  cashFlowEntries       CashFlowEntry[]
+  exceptions            Exception[]
+  documents             Document[]
+  alerts                Alert[]
+  agentRuns             AgentRun[]
+  agentActivities       AgentActivity[]
+  auditLogs             AuditLog[]
+  aiInsights            AIInsight[]
+  reconciliationRuns    ReconciliationRun[]
+  reconciliationMatches ReconciliationMatch[]
 }
+
+// ============================================================
+// USERS
+// ============================================================
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  role      String   @default("ANALYST") // CFO, CONTROLLER, ANALYST, ADMIN
-  avatarUrl String?
-  companyId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  email          String
+  role           UserRole @default(VIEWER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentRuns      AgentRun[]
+  auditLogs      AuditLog[]
+
+  @@unique([organizationId, email])
+  @@index([organizationId])
 }
+
+// ============================================================
+// ACCOUNTS (bank / cash accounts)
+// ============================================================
+
+model Account {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  type           String   @default("BANK")
+  currency       String   @default("INR")
+  balance        Float    @default(0)
+  status         String   @default("ACTIVE")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  transactions   Transaction[]
+
+  @@index([organizationId])
+}
+
+// ============================================================
+// TRANSACTIONS
+// ============================================================
 
 model Transaction {
-  id          String   @id @default(cuid())
-  date        DateTime
-  type        String   // REVENUE, EXPENSE, TRANSFER
-  category    String   // e.g., "Software", "Payroll", "Sales", "Marketing"
-  subCategory String?
-  amount      Float
-  currency    String   @default("INR")
-  description String
-  reference   String?  // Bank reference / transaction ID
-  status      String   @default("CLEARED") // CLEARED, PENDING, FLAGGED
-  companyId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  organizationId String
+  accountId      String?
+  date           DateTime
+  type           String
+  category       String?
+  subCategory    String?
+  vendor         String?
+  amount         Float
+  currency       String   @default("INR")
+  description    String?
+  reference      String?
+  status         String   @default("CLEARED")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
-  exceptionId String?
+  organization          Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  account               Account?              @relation(fields: [accountId], references: [id])
+  payments              Payment[]
+  reconciliationMatches ReconciliationMatch[]
+
+  @@index([organizationId, date])
+  @@index([organizationId, type])
+  @@index([accountId])
 }
 
+// ============================================================
+// CUSTOMERS
+// ============================================================
+
+model Customer {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  email          String?
+  phone          String?
+  companyName    String?
+  status         String   @default("ACTIVE")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invoices       Invoice[]
+
+  @@index([organizationId])
+}
+
+// ============================================================
+// INVOICES
+// ============================================================
+
 model Invoice {
+  id             String    @id @default(cuid())
+  organizationId String
+  invoiceNumber  String
+  type           String
+  vendorClient   String
+  customerId     String?
+  amount         Float
+  issueDate      DateTime
+  dueDate        DateTime
+  paidDate       DateTime?
+  status         String    @default("PENDING")
+  description    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization          Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer              Customer?             @relation(fields: [customerId], references: [id])
+  items                 InvoiceItem[]
+  payments              Payment[]
+  reconciliationMatches ReconciliationMatch[]
+
+  @@unique([organizationId, invoiceNumber])
+  @@index([organizationId, status])
+  @@index([organizationId, dueDate])
+}
+
+// ============================================================
+// INVOICE ITEMS
+// ============================================================
+
+model InvoiceItem {
+  id          String @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Int    @default(1)
+  unitPrice   Float
+  taxRate     Float  @default(0)
+  total       Float
+
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+// ============================================================
+// PAYMENTS
+// ============================================================
+
+model Payment {
+  id             String   @id @default(cuid())
+  organizationId String
+  invoiceId      String?
+  transactionId  String?
+  amount         Float
+  paymentDate    DateTime
+  method         String
+  reference      String?
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invoice        Invoice?     @relation(fields: [invoiceId], references: [id])
+  transaction    Transaction? @relation(fields: [transactionId], references: [id])
+
+  @@index([organizationId])
+  @@index([invoiceId])
+  @@index([transactionId])
+}
+
+// ============================================================
+// EMPLOYEES
+// ============================================================
+
+model Employee {
+  id              String         @id @default(cuid())
+  organizationId  String
+  employeeCode    String
+  name            String
+  email           String?
+  phone           String?
+  department      String?
+  designation     String?
+  employmentType  String         @default("FULL_TIME")
+  hireDate        DateTime
+  terminationDate DateTime?
+  status          EmployeeStatus @default(ACTIVE)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salaryStructures SalaryStructure[]
+  attendance       Attendance[]
+  leaves           Leave[]
+  payrollItems     PayrollItem[]
+  payslips         Payslip[]
+
+  @@unique([organizationId, employeeCode])
+  @@index([organizationId, status])
+}
+
+// ============================================================
+// SALARY STRUCTURE
+// ============================================================
+
+model SalaryStructure {
   id            String    @id @default(cuid())
-  invoiceNumber String
-  type          String    // RECEIVABLE (client owes us), PAYABLE (we owe vendor)
-  vendorClient  String    // Name of vendor or client
-  amount        Float
+  employeeId    String
+  baseSalary    Float
+  allowances    Json?
+  deductions    Json?
   currency      String    @default("INR")
-  issueDate     DateTime
-  dueDate       DateTime
-  paidDate      DateTime?
-  status        String    @default("PENDING") // PENDING, PAID, OVERDUE, EXCEPTION
-  description   String?
-  companyId     String
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
-  exceptionId String?
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, effectiveFrom])
 }
+
+// ============================================================
+// ATTENDANCE
+// ============================================================
+
+model Attendance {
+  id            String           @id @default(cuid())
+  employeeId    String
+  date          DateTime
+  status        AttendanceStatus
+  hoursWorked   Float?
+  overtimeHours Float?
+  notes         String?
+  createdAt     DateTime         @default(now())
+
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, date])
+  @@index([employeeId, date])
+}
+
+// ============================================================
+// LEAVE
+// ============================================================
+
+model Leave {
+  id         String      @id @default(cuid())
+  employeeId String
+  startDate  DateTime
+  endDate    DateTime
+  type       String
+  reason     String?
+  status     LeaveStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([startDate, endDate])
+}
+
+// ============================================================
+// PAYROLL RECORD (company-wide aggregate per period)
+// ============================================================
 
 model PayrollRecord {
-  id          String   @id @default(cuid())
-  period      String   // e.g., "2025-08"
-  periodStart DateTime
-  periodEnd   DateTime
-  totalAmount Float
-  headcount   Int
-  status      String   @default("PENDING") // PENDING, PROCESSING, PAID, EXCEPTION
-  exceptions  Int      @default(0) // count of anomalies
-  companyId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  organizationId String
+  period         String
+  periodStart    DateTime
+  periodEnd      DateTime
+  totalAmount    Float
+  headcount      Int
+  status         String   @default("PENDING")
+  exceptions     Int      @default(0)
+  createdAt      DateTime @default(now())
 
-  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
-  exceptionId String?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  payslips       Payslip[]
+
+  @@index([organizationId, period])
 }
+
+// ============================================================
+// PAYSLIP (per-employee, per-period)
+// ============================================================
+
+model Payslip {
+  id              String   @id @default(cuid())
+  organizationId  String
+  employeeId      String
+  payrollRecordId String?
+  period          String
+  grossPay        Float
+  totalDeductions Float
+  netPay          Float
+  daysPresent     Int
+  daysOnLeave     Int
+  breakdown       Json?
+  status          String   @default("GENERATED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employee        Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  payrollRecord    PayrollRecord? @relation(fields: [payrollRecordId], references: [id])
+
+  @@unique([employeeId, period])
+  @@index([organizationId, period])
+}
+
+// ============================================================
+// CASH FLOW ENTRIES
+// ============================================================
 
 model CashFlowEntry {
-  id         String   @id @default(cuid())
-  date       DateTime
-  period     String   // "2025-08" for grouping
-  inflow     Float    @default(0)
-  outflow    Float    @default(0)
-  netFlow    Float    @default(0)
-  balance    Float    @default(0) // running balance
-  companyId  String
-  createdAt  DateTime @default(now())
+  id             String   @id @default(cuid())
+  organizationId String
+  date           DateTime
+  period         String
+  inflow         Float
+  outflow        Float
+  netFlow        Float
+  balance        Float
+  createdAt      DateTime @default(now())
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, date])
 }
+
+// ============================================================
+// EXCEPTIONS
+// ============================================================
 
 model Exception {
-  id          String    @id @default(cuid())
-  type        String    // RECONCILIATION, INVOICE, PAYROLL, FRAUD_ALERT, POLICY_BREACH
-  severity    String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
-  title       String
-  description String
-  status      String    @default("OPEN") // OPEN, IN_REVIEW, RESOLVED, DISMISSED
-  resolvedAt  DateTime?
-  companyId   String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String   @id @default(cuid())
+  organizationId String
+  type           String
+  severity       String
+  title          String
+  description    String
+  status         String   @default("OPEN")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  transactions    Transaction[]
-  invoices        Invoice[]
-  payrollRecords  PayrollRecord[]
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@index([organizationId, severity])
 }
 
-model Document {
-  id          String   @id @default(cuid())
-  name        String
-  type        String   // POLICY, CONTRACT, REPORT, RECEIPT, OTHER
-  url         String?
-  content     String?  // raw text for RAG ingestion
-  metadata    String?  // JSON string for flexible metadata (tags, author, etc.)
-  companyId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// ============================================================
+// DOCUMENTS (foundation for RAG)
+// ============================================================
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+model Document {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  type           String
+  content        String?
+  metadata       String?
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+}
+
+// ============================================================
+// AI INSIGHTS
+// ============================================================
+
+model AIInsight {
+  id                String    @id @default(cuid())
+  organizationId    String
+  type              String
+  title             String
+  description       String
+  severity          String
+  confidence        Float
+  evidence          String
+  recommendedAction String?
+  actionRouteTo     String?
+  sourceAgent       String
+  status            String    @default("NEW")
+  createdAt         DateTime  @default(now())
+  resolvedAt        DateTime?
+
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+}
+
+// ============================================================
+// AGENT ACTIVITY (deterministic tool-call trace, distinct from AgentRun)
+// ============================================================
+
+model AgentActivity {
+  id              String   @id @default(cuid())
+  organizationId  String
+  agentName       String
+  taskType        String
+  status          String
+  summary         String
+  input           String?
+  output          String?
+  confidenceScore Float?
+  mode            String
+  createdAt       DateTime @default(now())
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+}
+
+// ============================================================
+// RECONCILIATION
+// ============================================================
+
+model ReconciliationRun {
+  id             String    @id @default(cuid())
+  organizationId String
+  status         String    @default("RUNNING")
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  matches        ReconciliationMatch[]
+
+  @@index([organizationId])
+}
+
+model ReconciliationMatch {
+  id              String    @id @default(cuid())
+  organizationId  String
+  runId           String
+  transactionId   String
+  invoiceId       String
+  confidenceScore Float
+  matchType       String
+  reasoning       String
+  evidence        String
+  status          String    @default("PROPOSED")
+  decidedBy       String?
+  decidedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  run             ReconciliationRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  transaction     Transaction       @relation(fields: [transactionId], references: [id])
+  invoice         Invoice           @relation(fields: [invoiceId], references: [id])
+
+  @@unique([transactionId, invoiceId])
+  @@index([organizationId, status])
+}
+
+// ============================================================
+// PAYROLL (per-employee payroll run - newer structured flow,
+// coexists alongside the PayrollRecord/Payslip aggregate above)
+// ============================================================
+
+model PayrollRun {
+  id              String        @id @default(cuid())
+  organizationId  String
+  periodStart     DateTime
+  periodEnd       DateTime
+  totalGross      Float
+  totalDeductions Float
+  totalNet        Float
+  status          PayrollStatus @default(DRAFT)
+  processedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items           PayrollItem[]
+
+  @@index([organizationId, periodStart])
+  @@index([organizationId, status])
+}
+
+model PayrollItem {
+  id              String     @id @default(cuid())
+  payrollRunId    String
+  employeeId      String
+  basicSalary     Float
+  allowances      Float
+  grossSalary     Float
+  pf              Float      @default(0)
+  esi             Float      @default(0)
+  tax             Float      @default(0)
+  otherDeductions Float      @default(0)
+  totalDeductions Float
+  netSalary       Float
+  workingDays     Int?
+  paidDays        Int?
+  overtimeHours   Float?
+
+  payrollRun      PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  employee        Employee   @relation(fields: [employeeId], references: [id])
+
+  @@unique([payrollRunId, employeeId])
+  @@index([employeeId])
+}
+
+// ============================================================
+// ALERTS
+// ============================================================
+
+model Alert {
+  id             String        @id @default(cuid())
+  organizationId String
+  type           AlertType
+  severity       AlertSeverity
+  title          String
+  message        String
+  isRead         Boolean       @default(false)
+  isResolved     Boolean       @default(false)
+  metadata       Json?
+  createdAt      DateTime      @default(now())
+  resolvedAt     DateTime?
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, isRead])
+  @@index([organizationId, severity])
+}
+
+// ============================================================
+// AI AGENT EXECUTIONS (structured tool-call runs - newer flow,
+// coexists alongside the AgentActivity trace above)
+// ============================================================
+
+model AgentRun {
+  id             String               @id @default(cuid())
+  organizationId String
+  userId         String?
+  agent          AgentType
+  status         AgentExecutionStatus
+  request        String
+  response       String?
+  toolCalls      Json?
+  startedAt      DateTime             @default(now())
+  completedAt    DateTime?
+  error          String?
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, startedAt])
+  @@index([organizationId, agent])
+}
+
+// ============================================================
+// AUDIT LOG
+// ============================================================
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  action         String
+  entityType     String
+  entityId       String?
+  metadata       String?
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id])
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, entityType, entityId])
 }

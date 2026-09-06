@@ -12,78 +12,145 @@ import { CashFlowChart, CashFlowDataPoint } from "@/components/dashboard/CashFlo
 import { AICFOCommandCard } from "@/components/dashboard/AICFOCommandCard";
 import { QuickActionsBar } from "@/components/dashboard/QuickActionsBar";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
-import { OutstandingInvoicesCard } from "@/components/dashboard/OutstandingInvoicesCard";
-import { FinancialHealthCard } from "@/components/dashboard/FinancialHealthCard";
-import { AIInsightsRow } from "@/components/dashboard/AIInsightsRow";
+import { OutstandingInvoicesCard, InvoiceSummaryData } from "@/components/dashboard/OutstandingInvoicesCard";
+import { FinancialHealthCard, HealthScoreData } from "@/components/dashboard/FinancialHealthCard";
+import { AIInsightsRow, AIInsightData } from "@/components/dashboard/AIInsightsRow";
 import { AgentOrchestrator } from "@/components/dashboard/AgentOrchestrator";
 import { FinancialModals } from "@/components/dashboard/FinancialModals";
 import { Toast } from "@/components/dashboard/Toast";
+import { formatINR } from "@/lib/finance/formatting";
 import styles from "./OverviewDashboardClient.module.css";
 
-interface OverviewDashboardClientProps {
-  metrics: {
-    revenue: { current: number; changePct: number; isPositive: boolean };
-    expenses: { current: number; changePct: number; isPositive: boolean };
-    cashPosition: { current: number; changePct: number; isPositive: boolean };
-    accountsReceivable: { current: number; count: number; overdue: number };
-    accountsPayable: { current: number; count: number; dueSoon7Days: number };
-  };
-  cashFlowData: CashFlowDataPoint[];
+interface MetricBlock {
+  current: number;
+  changePct: number;
+  isPositive: boolean;
 }
 
-export function OverviewDashboardClient({
-  metrics,
-  cashFlowData,
-}: OverviewDashboardClientProps) {
-  const [activeModal, setActiveModal] = useState<"create-invoice" | "add-expense" | "ask-ai-cfo" | null>(null);
+interface OverviewDashboardClientProps {
+  overview: {
+    cash: MetricBlock;
+    revenue: MetricBlock;
+    receivables: { current: number; count: number; overdue: number };
+    payables: { current: number; count: number; dueSoon7Days: number };
+    healthScore: HealthScoreData;
+    invoiceSummary: InvoiceSummaryData;
+    insights: AIInsightData[];
+    cashFlowTrend: CashFlowDataPoint[];
+  };
+}
+
+export function OverviewDashboardClient({ overview }: OverviewDashboardClientProps) {
+  const [activeModal, setActiveModal] = useState<"create-invoice" | "add-expense" | "record-transaction" | "ask-ai-cfo" | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isReconciling, setIsReconciling] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
+  };
+
+  const handleReconcile = async () => {
+    if (isReconciling) return;
+    setIsReconciling(true);
+    showToast("Running Reconciliation Agent...");
+    try {
+      const res = await fetch("/api/agents/run", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        const count = json.data.reconciliationProposals?.length ?? 0;
+        showToast(
+          count > 0
+            ? `Reconciliation Agent proposed ${count} new match${count === 1 ? "" : "es"} - review them on the Reconciliation page.`
+            : "Reconciliation Agent ran - no new matches found."
+        );
+      } else {
+        showToast(`Reconciliation run failed: ${json.error?.message || "unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Reconciliation run failed:", error);
+      showToast("Reconciliation run failed due to a network error.");
+    } finally {
+      setIsReconciling(false);
+    }
+  };
+
+  const handleGenerateReport = () => {
+    const lines = [
+      "FINOVA — FINANCIAL SUMMARY REPORT",
+      `Generated: ${new Date().toLocaleString("en-IN")}`,
+      "",
+      "== CASH POSITION ==",
+      `Total Cash: ${formatINR(overview.cash.current, true)} (${overview.cash.isPositive ? "+" : ""}${overview.cash.changePct}% this month)`,
+      "",
+      "== REVENUE ==",
+      `Monthly Revenue: ${formatINR(overview.revenue.current, true)} (${overview.revenue.isPositive ? "+" : ""}${overview.revenue.changePct}% vs last month)`,
+      "",
+      "== RECEIVABLES ==",
+      `Accounts Receivable: ${formatINR(overview.receivables.current, true)} across ${overview.receivables.count} outstanding invoice(s), ${overview.receivables.overdue} overdue`,
+      "",
+      "== PAYABLES ==",
+      `Accounts Payable: ${formatINR(overview.payables.current, true)} across ${overview.payables.count} upcoming payment(s), ${overview.payables.dueSoon7Days} due within 7 days`,
+      "",
+      "== FINANCIAL HEALTH ==",
+      `Overall Score: ${overview.healthScore.score}/100`,
+      `  - Liquidity: ${overview.healthScore.components.liquidity}%`,
+      `  - Profitability: ${overview.healthScore.components.profitability}%`,
+      `  - Growth: ${overview.healthScore.components.growth}%`,
+      `  - Expense Control: ${overview.healthScore.components.expenseControl}%`,
+      `  - Receivables: ${overview.healthScore.components.receivables}%`,
+      `  - Risk: ${overview.healthScore.components.risk}%`,
+      "",
+      "== INVOICE STATUS ==",
+      `Overdue: ${formatINR(overview.invoiceSummary.overdue.amount, true)} (${overview.invoiceSummary.overdue.count})`,
+      `Due Soon: ${formatINR(overview.invoiceSummary.dueSoon.amount, true)} (${overview.invoiceSummary.dueSoon.count})`,
+      `Pending: ${formatINR(overview.invoiceSummary.pending.amount, true)} (${overview.invoiceSummary.pending.count})`,
+    ];
+    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `finova-financial-summary-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Financial summary report downloaded.");
   };
 
   return (
     <div className={styles.container}>
       {/* Row 1: Top 4 Financial Metric Cards */}
       <div className={styles.metricsGrid}>
-        {/* 1. Total Cash */}
         <MetricCard
           label="Total Cash"
-          value="₹12.4L"
-          changePct={8.4}
-          isPositive={true}
+          value={formatINR(overview.cash.current, true)}
+          changePct={overview.cash.changePct}
+          isPositive={overview.cash.isPositive}
           comparisonLabel="this month"
           icon={<Wallet size={14} />}
-          sparklinePoints="0,30 20,26 40,24 60,18 80,12 100,6"
         />
 
-        {/* 2. Accounts Receivable */}
         <MetricCard
           label="Accounts Receivable"
-          value="₹4.8L"
-          subtext="12 outstanding invoices"
+          value={formatINR(overview.receivables.current, true)}
+          subtext={`${overview.receivables.count} outstanding invoices`}
           icon={<ArrowDownLeft size={14} />}
-          sparklinePoints="0,28 20,24 40,26 60,20 80,16 100,10"
         />
 
-        {/* 3. Accounts Payable */}
         <MetricCard
           label="Accounts Payable"
-          value="₹2.1L"
-          subtext="7 upcoming payments"
+          value={formatINR(overview.payables.current, true)}
+          subtext={`${overview.payables.count} upcoming payments`}
           icon={<ArrowUpRight size={14} />}
-          sparklinePoints="0,18 20,22 40,19 60,24 80,21 100,16"
         />
 
-        {/* 4. Monthly Revenue */}
         <MetricCard
           label="Monthly Revenue"
-          value="₹8.6L"
-          changePct={14.2}
-          isPositive={true}
+          value={formatINR(overview.revenue.current, true)}
+          changePct={overview.revenue.changePct}
+          isPositive={overview.revenue.isPositive}
           comparisonLabel="vs last month"
           icon={<TrendingUp size={14} />}
-          sparklinePoints="0,32 20,27 40,22 60,16 80,11 100,4"
         />
       </div>
 
@@ -91,20 +158,15 @@ export function OverviewDashboardClient({
       <div className={styles.middleRow}>
         <div className={styles.cashFlowCol}>
           <CashFlowChart
-            data={cashFlowData}
+            data={overview.cashFlowTrend}
+            insight={overview.insights[0] ? { title: overview.insights[0].title, description: overview.insights[0].description } : null}
             onAskCFO={() => setActiveModal("ask-ai-cfo")}
           />
         </div>
         <div className={styles.aiCfoCol}>
           <AICFOCommandCard
             onAction={(action) => {
-              if (action === "review-invoices") {
-                showToast("Opening 3 overdue invoices (₹84,500 total)...");
-              } else if (action === "investigate-expenses") {
-                showToast("Scanning August marketing spend anomalies (+18%)...");
-              } else {
-                showToast("Analyzing duplicate SaaS subscriptions across departments...");
-              }
+              showToast(`Opening: ${action}`);
             }}
           />
         </div>
@@ -114,9 +176,9 @@ export function OverviewDashboardClient({
       <QuickActionsBar
         onCreateInvoice={() => setActiveModal("create-invoice")}
         onAddExpense={() => setActiveModal("add-expense")}
-        onRecordTransaction={() => showToast("Transaction recorder initialized. Syncing bank feeds...")}
-        onReconcile={() => showToast("Reconciliation Agent triggered: verifying 82 transaction hashes...")}
-        onGenerateReport={() => showToast("Financial Report Generator compiled August 2025 statement.")}
+        onRecordTransaction={() => setActiveModal("record-transaction")}
+        onReconcile={handleReconcile}
+        onGenerateReport={handleGenerateReport}
         onAskCFO={() => setActiveModal("ask-ai-cfo")}
       />
 
@@ -126,30 +188,20 @@ export function OverviewDashboardClient({
           <RecentTransactions />
         </div>
         <div className={styles.invoicesCol}>
-          <OutstandingInvoicesCard totalAmount="₹3.72L" totalCount={12} />
+          <OutstandingInvoicesCard invoiceSummary={overview.invoiceSummary} />
         </div>
         <div className={styles.healthCol}>
-          <FinancialHealthCard />
+          <FinancialHealthCard healthScore={overview.healthScore} />
         </div>
       </div>
 
       {/* Row 5: AI Insights Row */}
-      <AIInsightsRow
-        onSelectInsight={(id) => {
-          if (id === "revenue-accelerating") {
-            showToast("Opening revenue acceleration breakdown (3 enterprise contracts)...");
-          } else if (id === "vendor-pricing") {
-            showToast("Reviewing vendor price escalations across AWS, Notion, Figma...");
-          } else {
-            showToast("Displaying 4 underutilized software licenses (₹28,000 potential savings)...");
-          }
-        }}
-      />
+      <AIInsightsRow insights={overview.insights} onSelectInsight={() => {}} />
 
       {/* Row 6: Autonomous AI Agent Orchestrator */}
       <AgentOrchestrator
         onTriggerSync={() => showToast("Orchestrator sync initiated across 5 specialized agents.")}
-        onApproveBatch={() => showToast("Reconciliation Agent batch (3 transactions) approved and posted to ledger.")}
+        onApproveBatch={() => showToast("Reconciliation Agent batch approved and posted to ledger.")}
       />
 
       {/* Interactive Modals */}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -25,38 +25,30 @@ export interface CashFlowDataPoint {
   balance: number;
 }
 
+export interface CashFlowInsight {
+  title: string;
+  description: string;
+}
+
 interface CashFlowChartProps {
   data: CashFlowDataPoint[];
+  insight?: CashFlowInsight | null;
   onAskCFO?: () => void;
 }
 
-// 30-day realistic trajectory matching the reference curve
-const thirtyDaySeries = [
-  { label: "Sep 1", date: "Sep 1, 2026", revenue: 18.2, expenses: 6.4, netCash: 11.8 },
-  { label: "Sep 5", date: "Sep 5, 2026", revenue: 19.8, expenses: 7.1, netCash: 12.7 },
-  { label: "Sep 10", date: "Sep 10, 2026", revenue: 23.4, expenses: 6.9, netCash: 16.5 },
-  { label: "Sep 15", date: "Sep 15, 2026", revenue: 21.0, expenses: 7.8, netCash: 13.2 },
-  { label: "Sep 16", date: "Sep 16, 2026", revenue: 28.4, expenses: 7.2, netCash: 21.2 },
-  { label: "Sep 20", date: "Sep 20, 2026", revenue: 24.1, expenses: 8.4, netCash: 15.7 },
-  { label: "Sep 25", date: "Sep 25, 2026", revenue: 29.5, expenses: 8.9, netCash: 20.6 },
-  { label: "Sep 30", date: "Sep 30, 2026", revenue: 34.2, expenses: 9.6, netCash: 24.6 },
-];
-
-const sevenDaySeries = [
-  { label: "Mon", date: "Sep 24, 2026", revenue: 4.8, expenses: 1.2, netCash: 3.6 },
-  { label: "Tue", date: "Sep 25, 2026", revenue: 5.2, expenses: 1.5, netCash: 3.7 },
-  { label: "Wed", date: "Sep 26, 2026", revenue: 6.1, expenses: 2.1, netCash: 4.0 },
-  { label: "Thu", date: "Sep 27, 2026", revenue: 5.8, expenses: 1.4, netCash: 4.4 },
-  { label: "Fri", date: "Sep 28, 2026", revenue: 7.4, expenses: 2.6, netCash: 4.8 },
-  { label: "Sat", date: "Sep 29, 2026", revenue: 3.1, expenses: 0.8, netCash: 2.3 },
-  { label: "Sun", date: "Sep 30, 2026", revenue: 4.5, expenses: 0.9, netCash: 3.6 },
-];
-
-export function CashFlowChart({ data, onAskCFO }: CashFlowChartProps) {
-  const [timeframe, setTimeframe] = useState<"7D" | "30D" | "3M" | "6M" | "1Y">("30D");
-
-  // Determine active chart series
-  const activeSeries = timeframe === "7D" ? sevenDaySeries : thirtyDaySeries;
+export function CashFlowChart({ data, insight, onAskCFO }: CashFlowChartProps) {
+  // Real seeded data is monthly (CashFlowEntry), so there's no sub-month
+  // resolution to select between - every period shows the same real series
+  // rather than faking a daily/weekly breakdown we don't have.
+  const activeSeries = data.map((d) => ({
+    label: d.label,
+    date: d.label,
+    revenue: Math.round((d.inflow / 100000) * 100) / 100,
+    expenses: Math.round((d.outflow / 100000) * 100) / 100,
+    netCash: Math.round((d.netFlow / 100000) * 100) / 100,
+  }));
+  const maxValue = Math.max(10, ...activeSeries.map((d) => Math.max(d.revenue, d.expenses)));
+  const yDomainMax = Math.ceil((maxValue * 1.15) / 10) * 10;
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -93,19 +85,7 @@ export function CashFlowChart({ data, onAskCFO }: CashFlowChartProps) {
         <div className={styles.header}>
           <div className={styles.titleGroup}>
             <h2 className={styles.title}>Cash Flow</h2>
-            <p className={styles.subtitle}>Revenue, expenses and net cash flow over time.</p>
-          </div>
-
-          <div className={styles.timeframePills}>
-            {(["7D", "30D", "3M", "6M", "1Y"] as const).map((t) => (
-              <button
-                key={t}
-                className={`${styles.pillBtn} ${timeframe === t ? styles.pillBtnActive : ""}`}
-                onClick={() => setTimeframe(t)}
-              >
-                {t}
-              </button>
-            ))}
+            <p className={styles.subtitle}>Revenue, expenses and net cash flow by month.</p>
           </div>
         </div>
 
@@ -154,8 +134,7 @@ export function CashFlowChart({ data, onAskCFO }: CashFlowChartProps) {
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v) => `${v}L`}
-                domain={[0, 40]}
-                ticks={[10, 20, 30, 40]}
+                domain={[0, yDomainMax]}
               />
               <Tooltip content={<CustomTooltip />} />
               <Area
@@ -196,12 +175,19 @@ export function CashFlowChart({ data, onAskCFO }: CashFlowChartProps) {
           <span>AI Insight</span>
         </div>
 
-        <h4 className={styles.insightTitle}>
-          Cash position is trending <strong className={styles.highlight}>14% higher</strong> than your previous quarter.
-        </h4>
-        <p className={styles.insightDesc}>
-          Collections are the primary driver. Enterprise accounts receivable turnover accelerated by 6.4 days.
-        </p>
+        {insight ? (
+          <>
+            <h4 className={styles.insightTitle}>{insight.title}</h4>
+            <p className={styles.insightDesc}>{insight.description}</p>
+          </>
+        ) : (
+          <>
+            <h4 className={styles.insightTitle}>No AI insights yet.</h4>
+            <p className={styles.insightDesc}>
+              Run the Agent Orchestrator sync to have Finova&apos;s specialist agents scan your ledger for anomalies and risks.
+            </p>
+          </>
+        )}
 
         <button
           className={styles.askCFOButton}

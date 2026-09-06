@@ -2,10 +2,10 @@ import prisma from "@/lib/db/prisma";
 import { FinancialBrief, IAIFinancialService } from "./types";
 
 export class RuleBasedFinancialAnalyzer implements IAIFinancialService {
-  async generateFinancialBrief(companyId?: string): Promise<FinancialBrief> {
-    const company = companyId
-      ? await prisma.company.findUnique({ where: { id: companyId } })
-      : await prisma.company.findFirst();
+  async generateFinancialBrief(organizationId?: string): Promise<FinancialBrief> {
+    const company = organizationId
+      ? await prisma.organization.findUnique({ where: { id: organizationId } })
+      : await prisma.organization.findFirst();
 
     const cId = company?.id || "comp_arcova";
 
@@ -17,11 +17,11 @@ export class RuleBasedFinancialAnalyzer implements IAIFinancialService {
 
     const [augRev, julRev] = await Promise.all([
       prisma.transaction.aggregate({
-        where: { companyId: cId, type: "REVENUE", date: { gte: augStart, lte: augEnd } },
+        where: { organizationId: cId, type: "REVENUE", date: { gte: augStart, lte: augEnd } },
         _sum: { amount: true },
       }),
       prisma.transaction.aggregate({
-        where: { companyId: cId, type: "REVENUE", date: { gte: julStart, lte: julEnd } },
+        where: { organizationId: cId, type: "REVENUE", date: { gte: julStart, lte: julEnd } },
         _sum: { amount: true },
       }),
     ]);
@@ -33,11 +33,11 @@ export class RuleBasedFinancialAnalyzer implements IAIFinancialService {
     // 2. Calculate Software expense growth
     const [augSoft, julSoft] = await Promise.all([
       prisma.transaction.aggregate({
-        where: { companyId: cId, category: "Software", date: { gte: augStart, lte: augEnd } },
+        where: { organizationId: cId, category: "Software", date: { gte: augStart, lte: augEnd } },
         _sum: { amount: true },
       }),
       prisma.transaction.aggregate({
-        where: { companyId: cId, category: "Software", date: { gte: julStart, lte: julEnd } },
+        where: { organizationId: cId, category: "Software", date: { gte: julStart, lte: julEnd } },
         _sum: { amount: true },
       }),
     ]);
@@ -52,7 +52,7 @@ export class RuleBasedFinancialAnalyzer implements IAIFinancialService {
 
     const dueSoonPayables = await prisma.invoice.findMany({
       where: {
-        companyId: cId,
+        organizationId: cId,
         type: "PAYABLE",
         status: "PENDING",
         dueDate: { gte: refDate, lte: sevenDaysLater },

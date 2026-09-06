@@ -63,10 +63,10 @@ export interface ActivityEvent {
   severity?: string;
 }
 
-export async function getDashboardMetrics(companyId?: string): Promise<DashboardMetrics> {
-  const company = companyId
-    ? await prisma.company.findUnique({ where: { id: companyId } })
-    : await prisma.company.findFirst();
+export async function getDashboardMetrics(organizationId?: string): Promise<DashboardMetrics> {
+  const company = organizationId
+    ? await prisma.organization.findUnique({ where: { id: organizationId } })
+    : await prisma.organization.findFirst();
 
   const cId = company?.id || "comp_arcova";
 
@@ -80,7 +80,7 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
   // 1. Current & Previous Revenue
   const currentRevTx = await prisma.transaction.aggregate({
     where: {
-      companyId: cId,
+      organizationId: cId,
       type: "REVENUE",
       date: { gte: currentStart, lte: currentEnd },
     },
@@ -89,7 +89,7 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
 
   const prevRevTx = await prisma.transaction.aggregate({
     where: {
-      companyId: cId,
+      organizationId: cId,
       type: "REVENUE",
       date: { gte: prevStart, lte: prevEnd },
     },
@@ -103,7 +103,7 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
   // 2. Current & Previous Expenses
   const currentExpTx = await prisma.transaction.aggregate({
     where: {
-      companyId: cId,
+      organizationId: cId,
       type: "EXPENSE",
       date: { gte: currentStart, lte: currentEnd },
     },
@@ -112,7 +112,7 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
 
   const prevExpTx = await prisma.transaction.aggregate({
     where: {
-      companyId: cId,
+      organizationId: cId,
       type: "EXPENSE",
       date: { gte: prevStart, lte: prevEnd },
     },
@@ -125,12 +125,12 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
 
   // 3. Cash Position (Latest CashFlowEntry balance)
   const latestCashEntry = await prisma.cashFlowEntry.findFirst({
-    where: { companyId: cId },
+    where: { organizationId: cId },
     orderBy: { date: "desc" },
   });
 
   const prevCashEntry = await prisma.cashFlowEntry.findFirst({
-    where: { companyId: cId, date: { lte: prevEnd } },
+    where: { organizationId: cId, date: { lte: prevEnd } },
     orderBy: { date: "desc" },
   });
 
@@ -141,7 +141,7 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
   // 4. Accounts Receivable (unpaid RECEIVABLE invoices)
   const arInvoices = await prisma.invoice.findMany({
     where: {
-      companyId: cId,
+      organizationId: cId,
       type: "RECEIVABLE",
       status: { in: ["PENDING", "OVERDUE"] },
     },
@@ -159,7 +159,7 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
   // 5. Accounts Payable (unpaid PAYABLE invoices)
   const apInvoices = await prisma.invoice.findMany({
     where: {
-      companyId: cId,
+      organizationId: cId,
       type: "PAYABLE",
       status: { in: ["PENDING", "OVERDUE"] },
     },
@@ -231,15 +231,15 @@ export async function getDashboardMetrics(companyId?: string): Promise<Dashboard
   };
 }
 
-export async function getNeedsAttentionItems(companyId?: string): Promise<NeedsAttentionItem[]> {
-  const company = companyId
-    ? await prisma.company.findUnique({ where: { id: companyId } })
-    : await prisma.company.findFirst();
+export async function getNeedsAttentionItems(organizationId?: string): Promise<NeedsAttentionItem[]> {
+  const company = organizationId
+    ? await prisma.organization.findUnique({ where: { id: organizationId } })
+    : await prisma.organization.findFirst();
 
   const cId = company?.id || "comp_arcova";
 
   const openExceptions = await prisma.exception.findMany({
-    where: { companyId: cId, status: { in: ["OPEN", "IN_REVIEW"] } },
+    where: { organizationId: cId, status: { in: ["OPEN", "IN_REVIEW"] } },
   });
 
   const reconciliationCount = openExceptions.filter((e) => e.type === "RECONCILIATION").length;
@@ -252,7 +252,7 @@ export async function getNeedsAttentionItems(companyId?: string): Promise<NeedsA
 
   const dueSoonPayables = await prisma.invoice.findMany({
     where: {
-      companyId: cId,
+      organizationId: cId,
       type: "PAYABLE",
       status: "PENDING",
       dueDate: { gte: refDate, lte: sevenDaysLater },
@@ -299,10 +299,10 @@ export async function getNeedsAttentionItems(companyId?: string): Promise<NeedsA
   return items;
 }
 
-export async function getRecentActivity(companyId?: string): Promise<ActivityEvent[]> {
-  const company = companyId
-    ? await prisma.company.findUnique({ where: { id: companyId } })
-    : await prisma.company.findFirst();
+export async function getRecentActivity(organizationId?: string): Promise<ActivityEvent[]> {
+  const company = organizationId
+    ? await prisma.organization.findUnique({ where: { id: organizationId } })
+    : await prisma.organization.findFirst();
 
   const cId = company?.id || "comp_arcova";
 
@@ -357,15 +357,15 @@ export async function getRecentActivity(companyId?: string): Promise<ActivityEve
   return events;
 }
 
-export async function getCashFlowChartData(companyId?: string) {
-  const company = companyId
-    ? await prisma.company.findUnique({ where: { id: companyId } })
-    : await prisma.company.findFirst();
+export async function getCashFlowChartData(organizationId?: string) {
+  const company = organizationId
+    ? await prisma.organization.findUnique({ where: { id: organizationId } })
+    : await prisma.organization.findFirst();
 
   const cId = company?.id || "comp_arcova";
 
   const entries = await prisma.cashFlowEntry.findMany({
-    where: { companyId: cId },
+    where: { organizationId: cId },
     orderBy: { date: "asc" },
   });
 

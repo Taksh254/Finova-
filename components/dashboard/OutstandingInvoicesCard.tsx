@@ -3,17 +3,36 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, FileText } from "lucide-react";
+import { formatINR } from "@/lib/finance/formatting";
 import styles from "./OutstandingInvoicesCard.module.css";
 
-interface OutstandingInvoicesCardProps {
-  totalAmount?: string;
-  totalCount?: number;
+export interface InvoiceSummaryBucket {
+  amount: number;
+  count: number;
 }
 
-export function OutstandingInvoicesCard({
-  totalAmount = "₹3.72L",
-  totalCount = 12,
-}: OutstandingInvoicesCardProps) {
+export interface InvoiceSummaryData {
+  overdue: InvoiceSummaryBucket;
+  dueSoon: InvoiceSummaryBucket;
+  pending: InvoiceSummaryBucket;
+}
+
+interface OutstandingInvoicesCardProps {
+  invoiceSummary?: InvoiceSummaryData;
+}
+
+export function OutstandingInvoicesCard({ invoiceSummary }: OutstandingInvoicesCardProps) {
+  const overdue = invoiceSummary?.overdue ?? { amount: 0, count: 0 };
+  const dueSoon = invoiceSummary?.dueSoon ?? { amount: 0, count: 0 };
+  const pending = invoiceSummary?.pending ?? { amount: 0, count: 0 };
+
+  // "Due later" = pending invoices not already captured in the due-soon (7-day) window.
+  const dueLater = { amount: Math.max(0, pending.amount - dueSoon.amount), count: Math.max(0, pending.count - dueSoon.count) };
+  const total = overdue.amount + dueSoon.amount + dueLater.amount;
+  const totalCount = overdue.count + dueSoon.count + dueLater.count;
+
+  const pct = (n: number) => (total > 0 ? `${Math.max((n / total) * 100, 2)}%` : "0%");
+
   return (
     <div className={styles.card}>
       <div className={styles.header}>
@@ -26,7 +45,7 @@ export function OutstandingInvoicesCard({
 
       <div className={styles.valueRow}>
         <div className={styles.numberGroup}>
-          <span className={`${styles.mainValue} tabular-nums`}>{totalAmount}</span>
+          <span className={`${styles.mainValue} tabular-nums`}>{formatINR(total, true)}</span>
           <span className={styles.invoiceCount}>{totalCount} invoices</span>
         </div>
         <div className={styles.iconCircle}>
@@ -34,20 +53,18 @@ export function OutstandingInvoicesCard({
         </div>
       </div>
 
-      {/* Segmented Progress Bar */}
       <div className={styles.progressBar}>
-        <div className={styles.segmentOverdue} style={{ width: "33%" }} title="Overdue: ₹1.24L" />
-        <div className={styles.segmentDueWeek} style={{ width: "29%" }} title="Due this week: ₹1.08L" />
-        <div className={styles.segmentDueLater} style={{ width: "38%" }} title="Due later: ₹1.40L" />
+        <div className={styles.segmentOverdue} style={{ width: pct(overdue.amount) }} title={`Overdue: ${formatINR(overdue.amount, true)}`} />
+        <div className={styles.segmentDueWeek} style={{ width: pct(dueSoon.amount) }} title={`Due this week: ${formatINR(dueSoon.amount, true)}`} />
+        <div className={styles.segmentDueLater} style={{ width: pct(dueLater.amount) }} title={`Due later: ${formatINR(dueLater.amount, true)}`} />
       </div>
 
-      {/* Legend Breakdown */}
       <div className={styles.legendGrid}>
         <div className={styles.legendItem}>
           <span className={styles.dotOverdue} />
           <div className={styles.legendMeta}>
             <span className={styles.legendLabel}>Overdue</span>
-            <span className={styles.legendValue}>₹1.24L (4)</span>
+            <span className={styles.legendValue}>{formatINR(overdue.amount, true)} ({overdue.count})</span>
           </div>
         </div>
 
@@ -55,7 +72,7 @@ export function OutstandingInvoicesCard({
           <span className={styles.dotDueWeek} />
           <div className={styles.legendMeta}>
             <span className={styles.legendLabel}>Due this week</span>
-            <span className={styles.legendValue}>₹1.08L (3)</span>
+            <span className={styles.legendValue}>{formatINR(dueSoon.amount, true)} ({dueSoon.count})</span>
           </div>
         </div>
 
@@ -63,7 +80,7 @@ export function OutstandingInvoicesCard({
           <span className={styles.dotDueLater} />
           <div className={styles.legendMeta}>
             <span className={styles.legendLabel}>Due later</span>
-            <span className={styles.legendValue}>₹1.40L (5)</span>
+            <span className={styles.legendValue}>{formatINR(dueLater.amount, true)} ({dueLater.count})</span>
           </div>
         </div>
       </div>
