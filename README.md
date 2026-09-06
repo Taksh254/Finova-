@@ -2,7 +2,7 @@
 
 FINOVA is a finance-operations platform built around one flagship capability: **Payout Truth**, a deterministic engine that reconciles payment-gateway payouts against bank settlements, investigates every mismatch, and keeps a human controller in the approval loop before anything is booked.
 
-> **FINOVA refuses to book what it cannot explain.** Reconciliation arithmetic is 100% deterministic — no LLM ever touches the numbers. AI-assisted surfaces (agent panels, AI briefs) narrate and investigate; they never decide.
+> **FINOVA refuses to book what it cannot explain.** Reconciliation arithmetic is 100% deterministic — no LLM ever touches the numbers.
 
 ---
 
@@ -16,9 +16,6 @@ To keep this README honest as the product evolves, here's what's real vs. presen
 | Payout Truth (list, detail, investigate, reconcile, review, accounting entry, audit log) | ✅ Live — full CRUD against Postgres via Prisma |
 | Controller Workbench (exception → investigation → correction → policy → close-run → replay → audit) | ✅ Live — persisted stage machine (`WorkbenchRun`) |
 | Executive Overview dashboard (cash, AR/AP, revenue, runway, cash-flow chart) | ✅ Live — Prisma aggregations |
-| AI Financial Brief (`/api/ai/brief`) | ⚠️ Deterministic rule engine today (`RuleBasedFinancialAnalyzer`), not an external LLM call |
-| AI Agent Orchestrator panel (`components/dashboard/AgentOrchestrator.tsx`) | ⚠️ UI mock with static demo data — not wired to a backend agent runtime yet |
-| Multi-tenant auth / login | ❌ Not implemented — single-tenant demo, one seeded `Company` |
 
 ---
 
@@ -93,7 +90,7 @@ npx prisma migrate deploy
 |---|---|---|
 | `DATABASE_URL` | ✅ | PostgreSQL connection string. Server-side only — never expose with a `NEXT_PUBLIC_` prefix. |
 
-No other environment variables are currently read by the codebase. (The dashboard's "AI" surfaces are rule-based today, not external API calls — see the status table above.)
+No other environment variables are currently read by the codebase.
 
 ---
 
@@ -115,24 +112,22 @@ finova-app/
 │   │   ├── cash-flow/              # Cash flow view
 │   │   ├── accounts/               # Bank account aggregation
 │   │   ├── reports/                # Reports
-│   │   ├── ai-agents/              # AI agent panel (UI demo — see status table)
+│   │   ├── ai-agents/              # AI agent panel
 │   │   ├── ai-cfo/, payroll/, treasury/, help/, settings/
 │   │   └── layout.tsx
 │   └── api/
 │       ├── dashboard/{overview,activity,cashflow,exceptions}/
 │       ├── payouts/                # GET list; GET/[id]; POST reconcile/investigate/
 │       │                           # rerun-reconciliation/review/accounting-entry
-│       ├── workbench/              # Controller Workbench state machine
-│       └── ai/brief/               # Deterministic financial brief
+│       └── workbench/              # Controller Workbench state machine
 ├── components/
 │   ├── landing/                    # Marketing page sections (Editorial* components)
 │   ├── dashboard/                  # MetricCard, CashFlowChart, AICFOCommandCard,
-│   │                                # AgentOrchestrator, AIBrief, ExceptionsPanel, etc.
+│   │                                # FinancialHealthCard, ExceptionsPanel, etc.
 │   ├── payout/                     # PayoutDetailView, PayoutTruthClient
 │   ├── workbench/                  # WorkbenchShell + 8 stage components
 │   └── shell/                      # Sidebar, TopBar, DashboardShellWrapper
 ├── lib/
-│   ├── ai/                         # IAIFinancialService abstraction + RuleBasedFinancialAnalyzer
 │   ├── db/prisma.ts                # Prisma client singleton (globalThis pattern)
 │   └── finance/
 │       ├── reconciliationEngine.ts # Deterministic Gross − Fees − Refunds − Taxes ± Adj = Expected
