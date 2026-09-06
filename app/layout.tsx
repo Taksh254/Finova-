@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "@/components/shell/Sidebar";
-import { TopBar } from "@/components/shell/TopBar";
-import styles from "./layout.module.css";
 
 export const metadata: Metadata = {
-  title: "FINOVA — AI-Powered Finance Operations Platform",
-  description: "Enterprise finance operations, reconciliation, invoice intelligence, and automated cash management.",
+  title: "FINOVA — AI-Powered Autonomous Finance for Small Businesses",
+  description: "The autonomous financial operating system built for high-retention SMEs. Reconcile payouts, predict cash runways, and stop silent gateway leaks.",
 };
 
 export default function RootLayout({
@@ -17,13 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className={styles.layoutContainer}>
-          <Sidebar />
-          <div className={styles.mainWrapper}>
-            <TopBar />
-            <main className={styles.contentRegion}>{children}</main>
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   );

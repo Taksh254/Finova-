@@ -1,0 +1,211 @@
+.sectionWrapper {
+  padding: 96px 24px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 56px auto;
+}
+
+.sectionTag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.sectionTitle {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  color: var(--text-heading);
+  margin-bottom: 16px;
+  text-wrap: balance;
+}
+
+.sectionSubtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: stretch;
+}
+
+.comparisonCard {
+  border-radius: var(--radius-xl);
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition-property: transform, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-out;
+}
+
+/* Old Way Card */
+.cardOld {
+  background: #FFFFFF;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.04);
+}
+
+.cardOldHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #FEE2E2;
+}
+
+.badgeOld {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: #FEF2F2;
+  color: #DC2626;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-heading);
+}
+
+/* FINOVA Card */
+.cardFinova {
+  background: #FFFFFF;
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 12px 32px rgba(29, 59, 143, 0.09);
+}
+
+.cardFinovaHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-primary-light);
+}
+
+.badgeFinova {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--color-primary-border);
+}
+
+.pointsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  list-style: none;
+  flex: 1;
+}
+
+.pointItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.iconWrapRed {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #FEE2E2;
+  color: #DC2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.iconWrapGreen {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #DCFCE7;
+  color: #15803D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pointContent {
+  flex: 1;
+}
+
+.pointHeading {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 3px;
+}
+
+.pointText {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.finovaOutcomePill {
+  margin-top: 28px;
+  padding: 14px 18px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.outcomeText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.outcomeValue {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+@media (max-width: 860px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+}

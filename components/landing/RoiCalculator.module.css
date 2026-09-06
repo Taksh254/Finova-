@@ -1,0 +1,241 @@
+.calculatorSection {
+  padding: 96px 24px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 56px auto;
+}
+
+.tag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.title {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  color: var(--text-heading);
+  margin-bottom: 16px;
+  text-wrap: balance;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.calcCard {
+  background: #FFFFFF;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-card);
+  box-shadow: 0 16px 40px rgba(15, 26, 62, 0.07);
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  overflow: hidden;
+}
+
+/* Left Slider Panel */
+.sliderPanel {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sliderLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.sliderValueDisplay {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--color-primary-border);
+}
+
+.rangeInput {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border-medium);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(29, 59, 143, 0.4);
+  cursor: pointer;
+  transition-property: transform;
+  transition-duration: 0.1s;
+}
+
+.rangeInput::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.rangeLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.trustNote {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Right Result Panel */
+.resultPanel {
+  background: linear-gradient(145deg, #0F1A3E 0%, #0A1229 100%);
+  color: #FFFFFF;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.resultTitle {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #93C5FD;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.highlightAmount {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #FFFFFF;
+  margin-bottom: 6px;
+}
+
+.highlightSubtext {
+  font-size: 13px;
+  color: #CBD5E1;
+  margin-bottom: 28px;
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.breakdownRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13.5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.breakdownLabel {
+  color: #E2E8F0;
+}
+
+.breakdownVal {
+  font-weight: 700;
+  color: #60A5FA;
+}
+
+.roiMultiplierBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  color: #93C5FD;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  align-self: flex-start;
+}
+
+.calcCtaBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: #2563EB;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  transition-property: background-color, transform, box-shadow;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
+  text-decoration: none;
+}
+
+.calcCtaBtn:hover {
+  background: #1D4ED8;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+}
+
+.calcCtaBtn:active {
+  transform: scale(0.96);
+}
+
+@media (max-width: 860px) {
+  .calcCard {
+    grid-template-columns: 1fr;
+  }
+}
