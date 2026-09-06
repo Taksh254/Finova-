@@ -6,6 +6,18 @@ FINOVA is a finance-operations platform built around one flagship capability: **
 
 ---
 
+## Screenshots
+
+**Frontend** — Payout Truth (`/payout-truth`): live reconciliation summary and per-payout breakdown, rendered from real Postgres data.
+
+![Payout Truth frontend](docs/screenshots/frontend-payout-truth.png)
+
+**Backend** — raw JSON from `GET /api/payouts`, the API route backing the page above:
+
+![Backend API response](docs/screenshots/backend-api-response.png)
+
+---
+
 ## What's actually implemented
 
 To keep this README honest as the product evolves, here's what's real vs. presentational today:
@@ -13,9 +25,10 @@ To keep this README honest as the product evolves, here's what's real vs. presen
 | Feature | Status |
 |---|---|
 | Deterministic reconciliation engine (`lib/finance/reconciliationEngine.ts`) | ✅ Live — real arithmetic, real Postgres-backed state |
-| Payout Truth (list, detail, investigate, reconcile, review, accounting entry, audit log) | ✅ Live — full CRUD against Postgres via Prisma |
-| Controller Workbench (exception → investigation → correction → policy → close-run → replay → audit) | ✅ Live — persisted stage machine (`WorkbenchRun`) |
-| Executive Overview dashboard (cash, AR/AP, revenue, runway, cash-flow chart) | ✅ Live — Prisma aggregations |
+| Payout Truth (`/payout-truth`) — list, detail, investigate, reconcile, review, accounting entry, audit log | ✅ Live — full CRUD against Postgres via Prisma |
+| Controller Workbench (`/overview` — exception → investigation → correction → policy → close-run → replay → audit) | ✅ Live — persisted stage machine (`WorkbenchRun`). Note: despite the URL, this route renders the Workbench, not a metrics dashboard |
+| Exceptions register (`/exceptions`) | ✅ Live — server-rendered directly from Prisma |
+| Accounts, Cash Flow, Expenses, Invoices, Payroll, Reports, Settings, Transactions, Treasury, Reconciliation, AI CFO, Help | 🚧 Placeholder "coming soon" screens (`ModulePlaceholder`) — no real data yet |
 
 ---
 
@@ -102,18 +115,15 @@ finova-app/
 │   ├── page.tsx                    # Marketing landing page
 │   ├── layout.tsx                  # Root layout (metadata, global styles)
 │   ├── (dashboard)/                # Dashboard route group, wrapped by Sidebar + TopBar
-│   │   ├── overview/               # Executive Overview — cash, AR/AP, revenue, runway
+│   │   ├── overview/               # ★ Controller Workbench (multi-stage exception workflow)
+│   │   │                           # — note: URL is "overview", component is WorkbenchShell
 │   │   ├── payout-truth/           # ★ Flagship: gateway payout reconciliation
 │   │   │   └── [id]/               # Payout detail: evidence, investigation, review, entry, audit
-│   │   ├── reconciliation/         # Controller Workbench (multi-stage exception workflow)
-│   │   ├── transactions/           # Transaction ledger
-│   │   ├── invoices/               # Invoices & accounts receivable/payable
-│   │   ├── expenses/               # Spend tracking
-│   │   ├── cash-flow/              # Cash flow view
-│   │   ├── accounts/               # Bank account aggregation
-│   │   ├── reports/                # Reports
+│   │   ├── exceptions/             # Exceptions register (server-rendered from Prisma)
 │   │   ├── ai-agents/              # AI agent panel
-│   │   ├── ai-cfo/, payroll/, treasury/, help/, settings/
+│   │   ├── reconciliation/, transactions/, invoices/, expenses/, cash-flow/,
+│   │   │                          # accounts/, reports/, ai-cfo/, payroll/, treasury/,
+│   │   │                          # help/, settings/ — placeholder screens, no real data
 │   │   └── layout.tsx
 │   └── api/
 │       ├── dashboard/{overview,activity,cashflow,exceptions}/
