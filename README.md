@@ -22,7 +22,7 @@ To keep this README honest as the product evolves, here's what's real vs. presen
 ## Tech Stack
 
 - **Framework:** Next.js 15.5.25 (App Router), React 19, TypeScript 5.9
-- **Database:** PostgreSQL (AWS RDS in production) via Prisma ORM 6.19
+- **Database:** PostgreSQL via Prisma ORM 6.19 — the checked-in dev config points at **Prisma Postgres** (`db.prisma.io`, Prisma's managed Postgres service); the actual provider behind any given deployment depends on whatever `DATABASE_URL` is set there
 - **Styling:** CSS Modules — no Tailwind
 - **Charts/Icons:** Recharts, lucide-react
 - **Deployment:** Vercel (zero-config Next.js build)
@@ -43,7 +43,7 @@ Two distinct visual languages coexist in the app today:
 ### Prerequisites
 - Node.js 18+ (tested on v22.18)
 - npm 9+
-- A PostgreSQL database (local, Docker, or a hosted instance like AWS RDS/Supabase/Neon)
+- A PostgreSQL database (local, Docker, or a hosted instance like Prisma Postgres/Supabase/Neon/AWS RDS)
 
 ### Setup
 
