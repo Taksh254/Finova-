@@ -111,16 +111,16 @@ export function PayoutDetailView({
             QUICK SWITCH:
           </span>
           <Link
-            href="/payout-truth/PO-RZP-8492"
-            className={`${styles.casePill} ${payout.id === "PO-RZP-8492" ? styles.casePillActive : ""}`}
+            href="/payout-truth/PO-1024"
+            className={`${styles.casePill} ${payout.id === "PO-1024" || payout.id === "PO-RZP-8492" ? styles.casePillActive : ""}`}
           >
-            Case A: Reconciled (₹10L)
+            Case A: Reconciled (PO-1024)
           </Link>
           <Link
-            href="/payout-truth/PO-STR-9140"
-            className={`${styles.casePill} ${payout.id === "PO-STR-9140" ? styles.casePillActive : ""}`}
+            href="/payout-truth/PO-1025"
+            className={`${styles.casePill} ${payout.id === "PO-1025" || payout.id === "PO-STR-9140" ? styles.casePillActive : ""}`}
           >
-            Case B: Discrepancy (₹18k Gap)
+            Case B: Discrepancy (PO-1025)
           </Link>
         </div>
       </div>

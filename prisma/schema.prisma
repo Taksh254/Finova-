@@ -28,6 +28,7 @@ model Company {
   cashFlowEntries CashFlowEntry[]
   exceptions      Exception[]
   documents       Document[]
+  payouts         Payout[]
 }
 
 model User {
@@ -61,6 +62,8 @@ model Transaction {
   company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   exception   Exception? @relation(fields: [exceptionId], references: [id], onDelete: SetNull)
   exceptionId String?
+  payout      Payout?    @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  payoutId    String?
 }
 
 model Invoice {
@@ -132,6 +135,32 @@ model Exception {
   transactions    Transaction[]
   invoices        Invoice[]
   payrollRecords  PayrollRecord[]
+  payout          Payout?         @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  payoutId        String?
+}
+
+model Payout {
+  id                   String   @id // "PO-1024", "PO-1025", etc.
+  companyId            String
+  platform             String   // e.g., "RazorPay", "Stripe"
+  payoutDate           DateTime
+  grossAmount          Float
+  platformFees         Float
+  refunds              Float
+  taxes                Float
+  adjustments          Float    @default(0)
+  expectedNetAmount    Float
+  actualReceivedAmount Float
+  difference           Float    @default(0)
+  status               String   @default("PROCESSING") // PROCESSING, RECONCILED, NEEDS_REVIEW
+  reconciliationStatus String   @default("PENDING")    // PENDING, RECONCILED, FAILED
+  bankAccount          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  exceptions   Exception[]
 }
 
 model Document {

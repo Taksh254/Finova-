@@ -34,6 +34,7 @@ async function main() {
   await prisma.payrollRecord.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.transaction.deleteMany();
+  await prisma.payout.deleteMany();
   await prisma.document.deleteMany();
   await prisma.user.deleteMany();
   await prisma.company.deleteMany();
@@ -88,6 +89,49 @@ async function main() {
   console.log("✓ Created 3 users");
 
   // ============================================================
+  // PAYOUTS (Flagship Payout Truth Workflow)
+  // ============================================================
+  await prisma.payout.createMany({
+    data: [
+      {
+        id: "PO-1024",
+        companyId: company.id,
+        platform: "RazorPay",
+        payoutDate: d("2026-08-12"),
+        grossAmount: 1000000,
+        platformFees: 20000,
+        refunds: 15000,
+        taxes: 5000,
+        adjustments: 0,
+        expectedNetAmount: 960000,
+        actualReceivedAmount: 960000,
+        difference: 0,
+        status: "RECONCILED",
+        reconciliationStatus: "RECONCILED",
+        bankAccount: "HDFC Current A/c •••• 4092",
+      },
+      {
+        id: "PO-1025",
+        companyId: company.id,
+        platform: "RazorPay",
+        payoutDate: d("2026-08-14"),
+        grossAmount: 1000000,
+        platformFees: 20000,
+        refunds: 15000,
+        taxes: 5000,
+        adjustments: 0,
+        expectedNetAmount: 960000,
+        actualReceivedAmount: 942000,
+        difference: 18000,
+        status: "NEEDS_REVIEW",
+        reconciliationStatus: "FAILED",
+        bankAccount: "ICICI Current A/c •••• 8812",
+      },
+    ],
+  });
+  console.log("✓ Created 2 core payouts (PO-1024 Reconciled, PO-1025 Needs Review)");
+
+  // ============================================================
   // TRANSACTIONS
   // Period: April - September 2025
   //
@@ -113,6 +157,7 @@ async function main() {
     reference?: string;
     status: string;
     companyId: string;
+    payoutId?: string;
   }> = [];
 
   // ---- APRIL 2025 Revenue ----
@@ -204,7 +249,32 @@ async function main() {
     { date: d("2025-08-18"), type: "EXPENSE", category: "Office", amount: 100000, description: "Office rent + utilities - August", reference: "OFC-2025-08", status: "CLEARED", companyId: company.id },
     { date: d("2025-08-22"), type: "EXPENSE", category: "Legal", amount: 140000, description: "Enterprise contract legal review", reference: "LGL-2025-08", status: "CLEARED", companyId: company.id },
   );
-  // Aug expenses = 2120000 + 342000 + 193000 + 420000 + 100000 + 140000 = 3315000
+  // ---- PAYOUT TRUTH: Underlying Transactions for PO-1024 (Reconciled Case) ----
+  transactions.push(
+    // 1,240 orders represented across sales batches summing to ₹10,00,000 Gross Sales
+    { date: d("2026-08-10"), type: "REVENUE", category: "Sales", subCategory: "Razorpay Orders Batch 1", amount: 450000, description: "Razorpay settlement batch 1 - 550 customer orders", reference: "ORD-1024-B1", status: "CLEARED", companyId: company.id, payoutId: "PO-1024" },
+    { date: d("2026-08-11"), type: "REVENUE", category: "Sales", subCategory: "Razorpay Orders Batch 2", amount: 350000, description: "Razorpay settlement batch 2 - 420 customer orders", reference: "ORD-1024-B2", status: "CLEARED", companyId: company.id, payoutId: "PO-1024" },
+    { date: d("2026-08-12"), type: "REVENUE", category: "Sales", subCategory: "Razorpay Orders Batch 3", amount: 200000, description: "Razorpay settlement batch 3 - 270 customer orders", reference: "ORD-1024-B3", status: "CLEARED", companyId: company.id, payoutId: "PO-1024" },
+    // Platform fee deduction: ₹20,000
+    { date: d("2026-08-12"), type: "EXPENSE", category: "Platform Fees", subCategory: "Razorpay Fee", amount: 20000, description: "Razorpay 2.0% Processing Fee on PO-1024", reference: "FEE-RZP-1024", status: "CLEARED", companyId: company.id, payoutId: "PO-1024" },
+    // Customer refunds deduction: ₹15,000
+    { date: d("2026-08-12"), type: "EXPENSE", category: "Refunds", subCategory: "Customer Returns", amount: 15000, description: "Authorized returns & reversals (7 orders) on PO-1024", reference: "REF-RZP-1024", status: "CLEARED", companyId: company.id, payoutId: "PO-1024" },
+    // Statutory taxes deduction: ₹5,000
+    { date: d("2026-08-12"), type: "EXPENSE", category: "Taxes", subCategory: "GST & TDS", amount: 5000, description: "GST @ 18% on fee + 194H TDS on PO-1024", reference: "TAX-RZP-1024", status: "CLEARED", companyId: company.id, payoutId: "PO-1024" },
+  );
+
+  // ---- PAYOUT TRUTH: Underlying Transactions for PO-1025 (Exception Discrepancy Case) ----
+  transactions.push(
+    // Sales summing to ₹10,00,000 Gross Sales
+    { date: d("2026-08-13"), type: "REVENUE", category: "Sales", subCategory: "Razorpay Orders Batch 1", amount: 600000, description: "Razorpay settlement batch 1 - 710 customer orders", reference: "ORD-1025-B1", status: "CLEARED", companyId: company.id, payoutId: "PO-1025" },
+    { date: d("2026-08-14"), type: "REVENUE", category: "Sales", subCategory: "Razorpay Orders Batch 2", amount: 400000, description: "Razorpay settlement batch 2 - 470 customer orders", reference: "ORD-1025-B2", status: "CLEARED", companyId: company.id, payoutId: "PO-1025" },
+    // Platform fee deduction: ₹20,000
+    { date: d("2026-08-14"), type: "EXPENSE", category: "Platform Fees", subCategory: "Razorpay Fee", amount: 20000, description: "Razorpay 2.0% Processing Fee on PO-1025", reference: "FEE-RZP-1025", status: "CLEARED", companyId: company.id, payoutId: "PO-1025" },
+    // Authorized refunds: ₹15,000
+    { date: d("2026-08-14"), type: "EXPENSE", category: "Refunds", subCategory: "Authorized Returns", amount: 15000, description: "Authorized customer returns (6 orders) on PO-1025", reference: "REF-RZP-1025", status: "CLEARED", companyId: company.id, payoutId: "PO-1025" },
+    // Statutory taxes: ₹5,000
+    { date: d("2026-08-14"), type: "EXPENSE", category: "Taxes", subCategory: "GST & TDS", amount: 5000, description: "Statutory tax withholdings on PO-1025", reference: "TAX-RZP-1025", status: "CLEARED", companyId: company.id, payoutId: "PO-1025" },
+  );
 
   await prisma.transaction.createMany({ data: transactions });
   console.log(`✓ Created ${transactions.length} transactions`);
@@ -399,6 +469,18 @@ async function main() {
         description: "₹85,000 bank transfer on Aug 28 has no matching invoice or PO. Requires categorization.",
         status: "OPEN",
         companyId: company.id,
+      },
+    }),
+    prisma.exception.create({
+      data: {
+        id: "exc_po_1025",
+        type: "RECONCILIATION",
+        severity: "HIGH",
+        title: "Payout Discrepancy — PO-1025",
+        description: "₹18,000 of Payout PO-1025 remains unexplained. Expected ₹9,60,000 based on verified sales, fees, and taxes, but actual bank deposit was ₹9,42,000. Shortfall requires merchant dispute review.",
+        status: "OPEN",
+        companyId: company.id,
+        payoutId: "PO-1025",
       },
     }),
   ]);
